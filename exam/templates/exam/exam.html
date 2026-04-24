@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trucking MBA — Exam</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;800&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #0f1f38;
+      --blue: #1a3c5e;
+      --gold: #e8a020;
+      --red: #c0392b;
+      --light: #f4f6fa;
+    }
+    body { font-family: 'Barlow', sans-serif; background: var(--light); color: #1a1a2e; }
+
+    #timer-bar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      background: var(--navy);
+      padding: 10px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      transition: background 0.5s;
+    }
+    #timer-bar.warning { background: var(--red); animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.85} }
+    #timer-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      color: white; font-size: 13px;
+      letter-spacing: 2px; text-transform: uppercase;
+    }
+    #timer-display {
+      font-family: 'Barlow Condensed', sans-serif;
+      color: var(--gold); font-size: 28px; font-weight: 800;
+    }
+    #timer-bar.warning #timer-display { color: white; }
+    #student-info {
+      font-family: 'Barlow Condensed', sans-serif;
+      color: rgba(255,255,255,0.7); font-size: 14px;
+    }
+
+    .container { max-width: 780px; margin: 0 auto; padding: 100px 24px 60px; }
+    .page-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 36px; font-weight: 800;
+      color: var(--navy); margin-bottom: 6px;
+    }
+    .page-sub { color: #666; margin-bottom: 36px; font-size: 15px; }
+
+    .question-card {
+      background: white;
+      border-radius: 4px;
+      box-shadow: 0 2px 16px rgba(15,31,56,0.07);
+      margin-bottom: 20px;
+      overflow: hidden;
+      border-left: 4px solid var(--blue);
+    }
+    .question-card.career { border-left-color: var(--gold); }
+    .question-card.dispatch { border-left-color: #2980b9; }
+    .question-card.safety   { border-left-color: #27ae60; }
+    .question-card.fleet    { border-left-color: #8e44ad; }
+    .question-card.accounting { border-left-color: #16a085; }
+    .question-card.recruiting { border-left-color: #d35400; }
+    .question-card.update   { border-left-color: #c0392b; }
+
+    .q-header {
+      padding: 14px 24px 12px;
+      background: #f8f9fc;
+      border-bottom: 1px solid #edf0f7;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .q-dept {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 600;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: white; background: var(--blue);
+      padding: 3px 10px; border-radius: 2px;
+    }
+    .career    .q-dept { background: var(--gold); color: var(--navy); }
+    .dispatch  .q-dept { background: #2980b9; }
+    .safety    .q-dept { background: #27ae60; }
+    .fleet     .q-dept { background: #8e44ad; }
+    .accounting .q-dept { background: #16a085; }
+    .recruiting .q-dept { background: #d35400; }
+    .update    .q-dept { background: #c0392b; }
+
+    .q-title { font-weight: 600; font-size: 14px; color: #555; }
+    .q-body { padding: 20px 24px 24px; }
+    .q-text {
+      font-size: 16px; font-weight: 500;
+      color: var(--navy); margin-bottom: 16px; line-height: 1.5;
+    }
+
+    .mcq-options { display: flex; flex-direction: column; gap: 10px; }
+    .mcq-option input[type=radio] { display: none; }
+    .mcq-option label {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 16px;
+      border: 2px solid #dde3ee;
+      border-radius: 3px;
+      cursor: pointer; width: 100%; font-size: 15px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .mcq-option input:checked + label { border-color: var(--blue); background: #edf2fa; }
+    .opt-key {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--navy); color: white;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .open-answer {
+      width: 100%; min-height: 100px;
+      padding: 12px 16px;
+      border: 2px solid #dde3ee;
+      border-radius: 3px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 15px; resize: vertical;
+      outline: none; transition: border-color 0.2s;
+    }
+    .open-answer:focus { border-color: var(--blue); }
+    .optional-note { font-size: 12px; color: #999; margin-top: 8px; }
+
+    .submit-section { text-align: center; margin-top: 40px; }
+    .btn-submit {
+      padding: 18px 64px;
+      background: var(--navy); color: white;
+      border: none; border-radius: 3px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 20px; font-weight: 700;
+      letter-spacing: 1px; text-transform: uppercase;
+      cursor: pointer; transition: background 0.2s;
+    }
+    .btn-submit:hover { background: var(--blue); }
+  </style>
+</head>
+<body>
+
+<div id="timer-bar">
+  <div id="timer-label">⏱ Time Remaining</div>
+  <div id="timer-display">20:00</div>
+  <div id="student-info">{{ session.full_name }} &mdash; {{ session.group }}</div>
+</div>
+
+<div class="container">
+  <div class="page-title">Final Examination</div>
+  <p class="page-sub">Answer the questions below. All questions are optional — skip any that do not apply to your department.</p>
+
+  <form method="post" id="exam-form">
+    {% csrf_token %}
+
+    {% for question in questions %}
+      <input type="hidden" name="question_ids" value="{{ question.id }}">
+    {% endfor %}
+
+    {% for question in questions %}
+    <div class="question-card {{ question.department }}">
+      <div class="q-header">
+        <span class="q-dept">{{ question.get_department_display }}</span>
+        <span class="q-title">{{ question.title }}</span>
+      </div>
+      <div class="q-body">
+        <div class="q-text">{{ question.text }}</div>
+
+        {% if question.question_type == 'mcq' %}
+          <div class="mcq-options">
+            {% if question.option_a %}
+            <div class="mcq-option">
+              <input type="radio" name="q_{{ question.id }}" id="q{{ question.id }}_a" value="a">
+              <label for="q{{ question.id }}_a"><span class="opt-key">A</span> {{ question.option_a }}</label>
+            </div>
+            {% endif %}
+            {% if question.option_b %}
+            <div class="mcq-option">
+              <input type="radio" name="q_{{ question.id }}" id="q{{ question.id }}_b" value="b">
+              <label for="q{{ question.id }}_b"><span class="opt-key">B</span> {{ question.option_b }}</label>
+            </div>
+            {% endif %}
+            {% if question.option_c %}
+            <div class="mcq-option">
+              <input type="radio" name="q_{{ question.id }}" id="q{{ question.id }}_c" value="c">
+              <label for="q{{ question.id }}_c"><span class="opt-key">C</span> {{ question.option_c }}</label>
+            </div>
+            {% endif %}
+            {% if question.option_d %}
+            <div class="mcq-option">
+              <input type="radio" name="q_{{ question.id }}" id="q{{ question.id }}_d" value="d">
+              <label for="q{{ question.id }}_d"><span class="opt-key">D</span> {{ question.option_d }}</label>
+            </div>
+            {% endif %}
+          </div>
+        {% else %}
+          <textarea class="open-answer" name="q_{{ question.id }}" placeholder="Write your answer here..."></textarea>
+        {% endif %}
+
+        <p class="optional-note">Optional — leave blank if this topic was not part of your studies.</p>
+      </div>
+    </div>
+    {% endfor %}
+
+    <div class="submit-section">
+      <button type="submit" class="btn-submit" id="submit-btn">Submit Exam →</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  const DURATION = {{ exam_duration }};
+  const WARNING  = {{ warning_time }};
+  let remaining  = DURATION;
+
+  const timerEl = document.getElementById('timer-display');
+  const barEl   = document.getElementById('timer-bar');
+  const form    = document.getElementById('exam-form');
+
+  function formatTime(s) {
+    const m = Math.floor(s / 60).toString().padStart(2, '0');
+    const sec = (s % 60).toString().padStart(2, '0');
+    return `${m}:${sec}`;
+  }
+
+  const interval = setInterval(() => {
+    remaining--;
+    timerEl.textContent = formatTime(remaining);
+    if (remaining <= WARNING) barEl.classList.add('warning');
+    if (remaining <= 0) { clearInterval(interval); form.submit(); }
+  }, 1000);
+
+  window.addEventListener('beforeunload', (e) => {
+    e.preventDefault(); e.returnValue = '';
+  });
+  form.addEventListener('submit', () => {
+    clearInterval(interval);
+    window.removeEventListener('beforeunload', () => {});
+  });
+</script>
+</body>
+</html>

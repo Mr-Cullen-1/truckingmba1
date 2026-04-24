@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Trucking MBA — Admin Results</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Barlow', sans-serif; background: #f4f6fa; color: #1a1a2e; }
+    .topbar {
+      background: #0f1f38; padding: 18px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .topbar h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      color: white; font-size: 24px; font-weight: 800;
+    }
+    .topbar-links { display: flex; gap: 12px; align-items: center; }
+    .btn-export {
+      padding: 10px 24px;
+      background: #e8a020; color: #0f1f38;
+      border: none; border-radius: 3px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px; font-weight: 700;
+      cursor: pointer; text-decoration: none;
+    }
+    .btn-admin {
+      padding: 10px 24px;
+      background: rgba(255,255,255,0.1); color: white;
+      border: none; border-radius: 3px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px; font-weight: 700;
+      cursor: pointer; text-decoration: none;
+    }
+    .container { padding: 32px; overflow-x: auto; }
+
+    /* Session cards */
+    .session-card {
+      background: white; border-radius: 4px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      margin-bottom: 24px; overflow: hidden;
+    }
+    .session-header {
+      background: #0f1f38; padding: 14px 24px;
+      display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+    }
+    .s-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 20px; font-weight: 800; color: white;
+    }
+    .s-meta { font-size: 13px; color: rgba(255,255,255,0.65); }
+    .s-depts {
+      margin-left: auto;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px; font-weight: 600; letter-spacing: 1px;
+      color: #e8a020; text-transform: uppercase;
+    }
+    .s-badge {
+      padding: 3px 10px; border-radius: 2px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 12px; font-weight: 700; letter-spacing: 1px;
+    }
+    .badge-yes { background: #27ae60; color: white; }
+    .badge-no  { background: #e74c3c; color: white; }
+
+    .answers-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    .answers-table th {
+      background: #f4f6fa; padding: 10px 16px; text-align: left;
+      font-size: 11px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: #666;
+      border-bottom: 1px solid #edf0f7;
+    }
+    .answers-table td {
+      padding: 10px 16px;
+      border-bottom: 1px solid #edf0f7;
+      vertical-align: top;
+    }
+    .answers-table tr:last-child td { border-bottom: none; }
+    .dept-tag {
+      display: inline-block;
+      padding: 2px 8px; border-radius: 2px;
+      font-size: 11px; font-weight: 600; letter-spacing: 1px;
+      text-transform: uppercase; color: white;
+      background: #1a3c5e; margin-right: 8px;
+    }
+    .empty { color: #999; font-style: italic; }
+    .no-sessions {
+      text-align: center; padding: 60px;
+      color: #999; font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <h1>📋 Exam Results Dashboard</h1>
+    <div class="topbar-links">
+      <a href="{% url 'export_excel' %}" class="btn-export">📥 Export to Excel</a>
+      <a href="/admin/" class="btn-admin">Django Admin</a>
+    </div>
+  </div>
+
+  <div class="container">
+    {% if rows %}
+      {% for row in rows %}
+      <div class="session-card">
+        <div class="session-header">
+          <div>
+            <div class="s-name">{{ row.session.full_name }}</div>
+            <div class="s-meta">
+              {{ row.session.group }} &bull;
+              {{ row.session.teacher }} &bull;
+              {{ row.session.exam_date }} &bull;
+              {{ row.session.phone }}
+            </div>
+          </div>
+          <div class="s-depts">{{ row.dept_display }}</div>
+          <span class="s-badge {% if row.session.is_complete %}badge-yes{% else %}badge-no{% endif %}">
+            {% if row.session.is_complete %}Completed{% else %}Incomplete{% endif %}
+          </span>
+        </div>
+
+        {% if row.answered %}
+        <table class="answers-table">
+          <thead>
+            <tr>
+              <th style="width:200px">Department / Question</th>
+              <th>Answer</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ans in row.answered %}
+            <tr>
+              <td>
+                <span class="dept-tag">{{ ans.dept }}</span>
+                {{ ans.title }}
+              </td>
+              <td>{{ ans.value }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+          <p style="padding:20px 24px; color:#999; font-style:italic;">No answers submitted.</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="no-sessions">No exam sessions yet.</div>
+    {% endif %}
+  </div>
+</body>
+</html>

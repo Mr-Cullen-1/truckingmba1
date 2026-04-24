@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trucking MBA — Registration</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;800&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #0f1f38;
+      --blue: #1a3c5e;
+      --gold: #e8a020;
+      --light: #f4f6fa;
+      --text: #1a1a2e;
+    }
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: var(--light);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 16px;
+    }
+    .card {
+      background: white;
+      border-radius: 4px;
+      box-shadow: 0 8px 40px rgba(15,31,56,0.13);
+      width: 100%;
+      max-width: 540px;
+      overflow: hidden;
+    }
+    .card-header {
+      background: var(--navy);
+      padding: 36px 40px 28px;
+      position: relative;
+    }
+    .card-header::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 4px;
+      background: var(--gold);
+    }
+    .logo {
+      font-family: 'Barlow Condensed', sans-serif;
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      color: white;
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+    .card-body { padding: 36px 40px; }
+    .field { margin-bottom: 22px; }
+    .field > label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 7px;
+    }
+    input[type=text],
+    input[type=date],
+    input[type=tel] {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #dde3ee;
+      border-radius: 3px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 15px;
+      color: var(--text);
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    input:focus { border-color: var(--blue); }
+
+    /* Department checkboxes */
+    .dept-hint {
+      font-size: 13px;
+      color: #888;
+      margin-bottom: 12px;
+    }
+    .dept-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .dept-check {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      border: 2px solid #dde3ee;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text);
+      transition: border-color 0.15s, background 0.15s;
+      user-select: none;
+    }
+    .dept-check input[type=checkbox] {
+      width: 17px;
+      height: 17px;
+      accent-color: var(--blue);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .dept-check:has(input:checked) {
+      border-color: var(--blue);
+      background: #edf2fa;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 16px;
+      background: var(--navy);
+      color: white;
+      border: none;
+      border-radius: 3px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 8px;
+    }
+    .btn:hover { background: var(--blue); }
+    .errorlist {
+      color: #c0392b;
+      font-size: 12px;
+      margin-top: 6px;
+      list-style: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-header">
+      <div class="logo">Trucking MBA</div>
+      <h1>Final Exam<br>Registration</h1>
+    </div>
+    <div class="card-body">
+      <form method="post">
+        {% csrf_token %}
+
+        {% for field in form %}
+          <div class="field">
+            <label>{{ field.label }}</label>
+
+            {% if field.html_name == 'departments' %}
+              <p class="dept-hint">Select all departments you studied.</p>
+              <div class="dept-grid">
+                {% for checkbox in field %}
+                  <label class="dept-check">
+                    {{ checkbox.tag }}
+                    <span>{{ checkbox.choice_label }}</span>
+                  </label>
+                {% endfor %}
+              </div>
+            {% else %}
+              {{ field }}
+            {% endif %}
+
+            {% if field.errors %}
+              <ul class="errorlist">
+                {% for e in field.errors %}<li>{{ e }}</li>{% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+        {% endfor %}
+
+        <button type="submit" class="btn">Proceed to Exam →</button>
+      </form>
+    </div>
+  </div>
+</body>
+</html>

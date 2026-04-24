@@ -1,0 +1,20 @@
+trucking_mba/
+├── manage.py
+├── requirements.txt
+├── trucking_mba/
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+└── exam/
+    ├── models.py
+    ├── views.py
+    ├── urls.py
+    ├── admin.py
+    ├── forms.py
+    ├── templates/exam/
+    │   ├── register.html
+    │   ├── exam.html
+    │   ├── done.html
+    │   └── admin_results.html
+    └── static/exam/
+        └── exam.css
