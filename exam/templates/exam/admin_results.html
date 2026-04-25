@@ -33,21 +33,21 @@
       font-size: 16px; font-weight: 700;
       cursor: pointer; text-decoration: none;
     }
-    .container { padding: 32px; overflow-x: auto; }
+    .container { padding: 32px; }
 
     /* Session cards */
     .session-card {
       background: white; border-radius: 4px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-      margin-bottom: 24px; overflow: hidden;
+      margin-bottom: 32px; overflow: hidden;
     }
     .session-header {
-      background: #0f1f38; padding: 14px 24px;
+      background: #0f1f38; padding: 16px 24px;
       display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
     }
     .s-name {
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: 20px; font-weight: 800; color: white;
+      font-size: 22px; font-weight: 800; color: white;
     }
     .s-meta { font-size: 13px; color: rgba(255,255,255,0.65); }
     .s-depts {
@@ -57,38 +57,37 @@
       color: #e8a020; text-transform: uppercase;
     }
     .s-badge {
-      padding: 3px 10px; border-radius: 2px;
+      padding: 4px 12px; border-radius: 2px;
       font-family: 'Barlow Condensed', sans-serif;
       font-size: 12px; font-weight: 700; letter-spacing: 1px;
     }
     .badge-yes { background: #27ae60; color: white; }
     .badge-no  { background: #e74c3c; color: white; }
 
-    .answers-table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    .answers-table th {
-      background: #f4f6fa; padding: 10px 16px; text-align: left;
-      font-size: 11px; font-weight: 700; letter-spacing: 1px;
-      text-transform: uppercase; color: #666;
-      border-bottom: 1px solid #edf0f7;
+    .answers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 1px; background: #edf0f7;
     }
-    .answers-table td {
-      padding: 10px 16px;
-      border-bottom: 1px solid #edf0f7;
-      vertical-align: top;
+    .answer-item {
+      background: white; padding: 20px;
+      display: flex; flex-direction: column; gap: 10px;
     }
-    .answers-table tr:last-child td { border-bottom: none; }
+    .q-head { display: flex; justify-content: space-between; align-items: center; }
     .dept-tag {
-      display: inline-block;
       padding: 2px 8px; border-radius: 2px;
-      font-size: 11px; font-weight: 600; letter-spacing: 1px;
+      font-size: 10px; font-weight: 700; letter-spacing: 1px;
       text-transform: uppercase; color: white;
-      background: #1a3c5e; margin-right: 8px;
+      background: #1a3c5e;
     }
-    .empty { color: #999; font-style: italic; }
-    .no-sessions {
-      text-align: center; padding: 60px;
-      color: #999; font-size: 16px;
+    .q-title { font-weight: 700; font-size: 14px; color: #1a1a2e; }
+    .q-text { font-size: 13px; color: #555; line-height: 1.5; font-style: italic; }
+    .a-val {
+      margin-top: 5px; padding: 10px; background: #f8f9fc;
+      border-radius: 3px; border-left: 3px solid #e8a020;
+      font-weight: 500; font-size: 14px; color: #0f1f38;
     }
+    .no-sessions { text-align: center; padding: 80px; color: #999; }
   </style>
 </head>
 <body>
@@ -108,10 +107,7 @@
           <div>
             <div class="s-name">{{ row.session.full_name }}</div>
             <div class="s-meta">
-              {{ row.session.group }} &bull;
-              {{ row.session.teacher }} &bull;
-              {{ row.session.exam_date }} &bull;
-              {{ row.session.phone }}
+              {{ row.session.group }} &bull; {{ row.session.teacher }} &bull; {{ row.session.exam_date }} &bull; {{ row.session.phone }}
             </div>
           </div>
           <div class="s-depts">{{ row.dept_display }}</div>
@@ -121,27 +117,22 @@
         </div>
 
         {% if row.answered %}
-        <table class="answers-table">
-          <thead>
-            <tr>
-              <th style="width:200px">Department / Question</th>
-              <th>Answer</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for ans in row.answered %}
-            <tr>
-              <td>
-                <span class="dept-tag">{{ ans.dept }}</span>
-                {{ ans.title }}
-              </td>
-              <td>{{ ans.value }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+        <div class="answers-grid">
+          {% for ans in row.answered %}
+          <div class="answer-item">
+            <div class="q-head">
+              <span class="dept-tag">{{ ans.dept }}</span>
+              <span class="q-title">{{ ans.title }}</span>
+            </div>
+            <div class="q-text">"{{ ans.question_text }}"</div>
+            <div class="a-val">
+              <strong>Answer:</strong> {{ ans.value }}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
         {% else %}
-          <p style="padding:20px 24px; color:#999; font-style:italic;">No answers submitted.</p>
+          <p style="padding:32px; color:#999; font-style:italic; text-align:center;">No answers submitted for this session.</p>
         {% endif %}
       </div>
       {% endfor %}

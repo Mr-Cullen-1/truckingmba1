@@ -30,15 +30,15 @@
       color: #0f1f38; margin-bottom: 14px;
     }
     p { color: #555; font-size: 16px; line-height: 1.6; margin-bottom: 36px; }
-    .actions { display: flex; gap: 16px; justify-content: center; }
+    .actions { display: flex; justify-content: center; } /* Faqat bitta tugma uchun markazlash */
     .btn {
-      padding: 14px 28px; border: none; border-radius: 3px;
+      padding: 14px 40px; border: none; border-radius: 3px;
       font-family: 'Barlow Condensed', sans-serif;
       font-size: 17px; font-weight: 700;
       cursor: pointer; text-decoration: none; display: inline-block;
+      transition: opacity 0.2s;
     }
     .btn-primary { background: #0f1f38; color: white; }
-    .btn-secondary { background: #f4f6fa; color: #0f1f38; }
     .btn:hover { opacity: 0.9; }
   </style>
 </head>
@@ -49,7 +49,6 @@
     <p>Your answers have been collected.<br>Thank you for your participation.</p>
     <div class="actions">
       <a href="{% url 'register' %}" class="btn btn-primary">New Session</a>
-      <a href="{% url 'register' %}" class="btn btn-secondary">Another Student</a>
     </div>
   </div>
 </body>
