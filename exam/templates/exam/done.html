@@ -30,7 +30,7 @@
       color: #0f1f38; margin-bottom: 14px;
     }
     p { color: #555; font-size: 16px; line-height: 1.6; margin-bottom: 36px; }
-    .actions { display: flex; justify-content: center; } /* Faqat bitta tugma uchun markazlash */
+    .actions { display: flex; justify-content: center; } 
     .btn {
       padding: 14px 40px; border: none; border-radius: 3px;
       font-family: 'Barlow Condensed', sans-serif;
@@ -45,10 +45,11 @@
 <body>
   <div class="card">
     <div class="check">✓</div>
-    <h1>Exam Submitted!</h1>
+    <h1>Submitted!</h1>
     <p>Your answers have been collected.<br>Thank you for your participation.</p>
     <div class="actions">
-      <a href="{% url 'register' %}" class="btn btn-primary">New Session</a>
+      <!-- 'register' o'rniga 'home' (bosh sahifa) ga ulaymiz -->
+      <a href="{% url 'home' %}" class="btn btn-primary">Back to Dashboard</a>
     </div>
   </div>
 </body>

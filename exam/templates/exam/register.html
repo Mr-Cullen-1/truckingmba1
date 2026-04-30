@@ -59,6 +59,7 @@
       font-size: 32px;
       font-weight: 800;
       line-height: 1.1;
+      text-transform: uppercase;
     }
     .card-body { padding: 36px 40px; }
     .field { margin-bottom: 22px; }
@@ -73,7 +74,9 @@
     }
     input[type=text],
     input[type=date],
-    input[type=tel] {
+    input[type=tel],
+    input[type=email],
+    input[type=number] {
       width: 100%;
       padding: 12px 16px;
       border: 2px solid #dde3ee;
@@ -86,7 +89,7 @@
     }
     input:focus { border-color: var(--blue); }
 
-    /* Department checkboxes */
+    /* Department checkboxes grid */
     .dept-hint {
       font-size: 13px;
       color: #888;
@@ -108,7 +111,7 @@
       font-size: 15px;
       font-weight: 500;
       color: var(--text);
-      transition: border-color 0.15s, background 0.15s;
+      transition: all 0.15s;
       user-select: none;
     }
     .dept-check input[type=checkbox] {
@@ -118,6 +121,7 @@
       cursor: pointer;
       flex-shrink: 0;
     }
+    /* Tanlanganda ko'rinishi */
     .dept-check:has(input:checked) {
       border-color: var(--blue);
       background: #edf2fa;
@@ -140,19 +144,31 @@
       margin-top: 8px;
     }
     .btn:hover { background: var(--blue); }
+    
     .errorlist {
       color: #c0392b;
       font-size: 12px;
       margin-top: 6px;
       list-style: none;
+      padding-left: 0;
     }
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: var(--gray);
+      text-decoration: none;
+    }
+    .back-link:hover { color: var(--navy); }
   </style>
 </head>
 <body>
   <div class="card">
     <div class="card-header">
       <div class="logo">Trucking MBA</div>
-      <h1>Final Exam<br>Registration</h1>
+      <!-- Dinamik sarlavha: Practice Session yoki Final Exam[cite: 3, 6] -->
+      <h1>{{ title }}<br>{{ subtitle }}</h1>
     </div>
     <div class="card-body">
       <form method="post">
@@ -160,7 +176,7 @@
 
         {% for field in form %}
           <div class="field">
-            <label>{{ field.label }}</label>
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
 
             {% if field.html_name == 'departments' %}
               <p class="dept-hint">Select all departments you studied.</p>
@@ -178,13 +194,16 @@
 
             {% if field.errors %}
               <ul class="errorlist">
-                {% for e in field.errors %}<li>{{ e }}</li>{% endfor %}
+                {% for error in field.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
               </ul>
             {% endif %}
           </div>
         {% endfor %}
 
         <button type="submit" class="btn">Proceed to Exam →</button>
+        <a href="{% url 'home' %}" class="back-link">← Back to Dashboard</a>
       </form>
     </div>
   </div>

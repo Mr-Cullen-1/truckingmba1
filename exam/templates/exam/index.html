@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trucking MBA — Dashboard</title>
+  
+  <link rel="icon" type="image/x-icon" href="/static/img/favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;800&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #0f1f38;
+      --blue: #1a3c5e;
+      --gold: #e8a020;
+      --light: #f4f6fa;
+      --text: #1a1a2e;
+      --gray: #888;
+      --white: #ffffff;
+    }
+    body {
+      font-family: 'Barlow', sans-serif;
+      background: var(--light);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    header {
+      background: var(--white);
+      padding: 10px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      z-index: 10;
+    }
+    .header-left .logo-img { height: 40px; display: block; }
+    .teacher-btn {
+      background: var(--navy);
+      color: var(--gold);
+      padding: 10px 20px;
+      text-decoration: none;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      border-radius: 2px;
+      transition: all 0.2s ease;
+    }
+    .teacher-btn:hover { background: var(--blue); color: var(--white); }
+
+    /* MAIN CONTENT */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px 16px;
+    }
+    
+    .brand-top {
+      font-family: 'Barlow Condensed', sans-serif;
+      color: var(--navy);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      opacity: 0.9;
+    }
+
+    .header-section h1 {
+      font-family: 'Barlow Condensed', sans-serif;
+      color: var(--navy);
+      font-size: 42px;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 40px;
+      line-height: 1;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 25px;
+      width: 100%;
+      max-width: 960px;
+    }
+
+    /* CARD DYNAMIC HOVER EFFECT */
+    .card {
+      background: white;
+      border-radius: 4px;
+      box-shadow: 0 4px 20px rgba(15,31,56,0.06);
+      padding: 35px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      /* Dinamik effekt uchun transition qo'shildi */
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+      cursor: pointer;
+    }
+
+    /* Sichqonchani olib borganda (Hover) */
+    .card:hover {
+      transform: translateY(-10px); /* Tepaga ko'tarilish */
+      box-shadow: 0 15px 35px rgba(15,31,56,0.15); /* Soya kuchayishi */
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 4px;
+      transition: height 0.3s ease; /* Hoverda chiziq qalinlashishi uchun */
+    }
+    
+    .card:hover::before {
+      height: 8px; /* Hoverda rangli chiziq qalinlashadi */
+    }
+
+    .card.logistics::before { background: var(--blue); }
+    .card.qd::before { background: var(--gold); }
+
+    .card-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 12px;
+    }
+    .card-desc {
+      font-size: 14px;
+      color: var(--gray);
+      margin-bottom: 25px;
+      line-height: 1.4;
+    }
+    .btn {
+      display: block;
+      text-align: center;
+      padding: 12px;
+      text-decoration: none;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      text-transform: uppercase;
+      border-radius: 2px;
+      margin-top: 8px;
+      transition: background 0.2s;
+    }
+    .btn-primary { background: var(--navy); color: white; }
+    .btn-primary:hover { background: var(--blue); }
+    .btn-outline { border: 2px solid var(--navy); color: var(--navy); }
+    .btn-outline:hover { background: var(--navy); color: white; }
+    .btn-disabled { background: #e8e8e8; color: #b0b0b0; cursor: not-allowed; }
+
+    /* FOOTER */
+    footer {
+      background: var(--navy);
+      color: rgba(255,255,255,0.4);
+      padding: 15px 40px;
+      text-align: center;
+    }
+    .footer-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      font-size: 11px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-left">
+      <img src="/static/img/logo.png" alt="Trucking MBA" class="logo-img">
+    </div>
+    <div class="header-right">
+      <a href="{% url 'admin_results' %}" class="teacher-btn">Teacher's Panel</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="header-section" style="text-align: center;">
+      <div class="brand-top">Trucking MBA School</div>
+      <h1>Examination Portal</h1>
+    </div>
+
+    <div class="grid-container">
+      <!-- Logistics Card -->
+      <div class="card logistics">
+        <h2 class="card-title">Logistics Department</h2>
+        <p class="card-desc">Take mock tests or the official final certification exam to validate your skills.</p>
+        <a href="{% url 'register_mock' %}" class="btn btn-outline">Start Mock Exam</a>
+        <a href="{% url 'final_access' %}" class="btn btn-primary">Final Exam Login</a>
+      </div>
+
+      <!-- QD & English Card -->
+      <div class="card qd">
+        <h2 class="card-title">QD & English</h2>
+        <p class="card-desc">Advanced communication and quality assurance modules for logistics professionals.</p>
+        <div class="btn btn-disabled">English Session (Soon)</div>
+        <div class="btn btn-disabled">QD Mock Session (Soon)</div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-content">
+      <span>&copy; 2026 Trucking MBA School</span>
+      <span>All rights reserved</span>
+      <span style="opacity: 0.7">Premium Logistics Education</span>
+    </div>
+  </footer>
+
+</body>
+</html>

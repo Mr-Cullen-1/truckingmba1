@@ -64,6 +64,7 @@
     .badge-yes { background: #27ae60; color: white; }
     .badge-no  { background: #e74c3c; color: white; }
 
+    /* Natijalar gridi */
     .answers-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
@@ -86,6 +87,7 @@
       margin-top: 5px; padding: 10px; background: #f8f9fc;
       border-radius: 3px; border-left: 3px solid #e8a020;
       font-weight: 500; font-size: 14px; color: #0f1f38;
+      word-break: break-word; /* Uzun javoblar sig'ishi uchun */
     }
     .no-sessions { text-align: center; padding: 80px; color: #999; }
   </style>
@@ -95,7 +97,7 @@
     <h1>📋 Exam Results Dashboard</h1>
     <div class="topbar-links">
       <a href="{% url 'export_excel' %}" class="btn-export">📥 Export to Excel</a>
-      <a href="/admin/" class="btn-admin">Django Admin</a>
+      <a href="{% url 'home' %}" class="btn-admin">Back to Portal</a>
     </div>
   </div>
 
@@ -105,9 +107,10 @@
       <div class="session-card">
         <div class="session-header">
           <div>
-            <div class="s-name">{{ row.session.full_name }}</div>
+            <!-- Imtihon turi: Mock yoki Final -->
+            <div class="s-name">{{ row.session.get_exam_type_display }} — {{ row.session.full_name }}</div>
             <div class="s-meta">
-              {{ row.session.group }} &bull; {{ row.session.teacher }} &bull; {{ row.session.exam_date }} &bull; {{ row.session.phone }}
+              Group: {{ row.session.group }} &bull; Teacher: {{ row.session.teacher }} &bull; Date: {{ row.session.exam_date }}
             </div>
           </div>
           <div class="s-depts">{{ row.dept_display }}</div>
@@ -124,8 +127,10 @@
               <span class="dept-tag">{{ ans.dept }}</span>
               <span class="q-title">{{ ans.title }}</span>
             </div>
+            <!-- views.py dan keladigan question_text -->
             <div class="q-text">"{{ ans.question_text }}"</div>
             <div class="a-val">
+              <!-- views.py dan keladigan value -->
               <strong>Answer:</strong> {{ ans.value }}
             </div>
           </div>

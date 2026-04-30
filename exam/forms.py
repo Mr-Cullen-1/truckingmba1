@@ -3,18 +3,12 @@ from .models import ExamSession, DEPARTMENT_CHOICES
 
 STUDENT_DEPT_CHOICES = [c for c in DEPARTMENT_CHOICES if c[0] != 'career']
 
-
-class RegistrationForm(forms.ModelForm):
-    exam_date = forms.DateField(
-        widget=forms.DateInput(attrs={'type': 'date'}),
-        label="Exam Date"
-    )
-
+class FinalRegistrationForm(forms.ModelForm):
+    """Final imtihon uchun barcha maydonlar majburiy"""
+    exam_date = forms.DateField(widget=forms.DateInput(attrs={'type': 'date'}))
     departments = forms.MultipleChoiceField(
         choices=STUDENT_DEPT_CHOICES,
-        widget=forms.CheckboxSelectMultiple,
-        label="Choose your departments",
-        help_text="Select all departments you studied."
+        widget=forms.CheckboxSelectMultiple
     )
 
     class Meta:
@@ -28,4 +22,22 @@ class RegistrationForm(forms.ModelForm):
         }
 
     def clean_departments(self):
-        return ','.join(self.cleaned_data['departments'])
+        return ','.join(self.cleaned_data.get('departments', []))
+
+class MockRegistrationForm(forms.ModelForm):
+    """Mock uchun faqat ism, guruh va yo'nalishlar kifoya"""
+    departments = forms.MultipleChoiceField(
+        choices=STUDENT_DEPT_CHOICES,
+        widget=forms.CheckboxSelectMultiple
+    )
+
+    class Meta:
+        model = ExamSession
+        fields = ['full_name', 'group', 'departments']
+        labels = {
+            'full_name': 'Student Name',
+            'group': 'Your Group',
+        }
+
+    def clean_departments(self):
+        return ','.join(self.cleaned_data.get('departments', []))
