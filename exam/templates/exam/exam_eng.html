@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trucking MBA — English Session</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;800&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #0f1f38;
+      --accent: #6c5ce7; /* English Session uchun binafsha rang */
+      --gold: #e8a020;
+      --red: #c0392b;
+      --light: #f4f6fa;
+      --glass: rgba(255, 255, 255, 0.9);
+    }
+    body { font-family: 'Barlow', sans-serif; background: var(--light); color: #1a1a2e; }
+
+    /* Timer bar dizayni o'zgarishsiz qoldi */
+    #timer-bar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      background: var(--navy); padding: 10px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    #timer-bar.warning { background: var(--red); animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.85} }
+    #timer-display { font-family: 'Barlow Condensed', sans-serif; color: var(--gold); font-size: 28px; font-weight: 800; }
+
+    .container { max-width: 850px; margin: 0 auto; padding: 100px 24px 60px; }
+    .page-title { font-family: 'Barlow Condensed', sans-serif; font-size: 36px; font-weight: 800; color: var(--navy); }
+    .page-sub { color: #666; margin-bottom: 36px; }
+
+    .question-card {
+      background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      margin-bottom: 24px; overflow: hidden; border-top: 4px solid var(--accent);
+    }
+    .q-header { padding: 12px 24px; background: #fcfcff; border-bottom: 1px solid #f0f0f5; display: flex; justify-content: space-between; }
+    .q-type-label { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
+    
+    .q-body { padding: 24px; }
+    .q-text { font-size: 18px; font-weight: 500; color: var(--navy); margin-bottom: 20px; }
+
+    /* MCQ Styles */
+    .mcq-options { display: grid; gap: 12px; }
+    .mcq-option input { display: none; }
+    .mcq-option label {
+      display: flex; align-items: center; padding: 14px 20px;
+      border: 2px solid #eee; border-radius: 6px; cursor: pointer; transition: 0.2s;
+    }
+    .mcq-option input:checked + label { border-color: var(--accent); background: #f5f3ff; }
+
+    /* Scramble (Sentence Building) Styles */
+    .word-pool { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; padding: 15px; background: #f8f9fa; border-radius: 6px; }
+    .word-item { 
+      padding: 6px 14px; background: white; border: 1px solid #ddd; 
+      border-radius: 4px; cursor: pointer; user-select: none; transition: 0.2s;
+    }
+    .word-item:hover { border-color: var(--accent); color: var(--accent); }
+    .word-item.used { opacity: 0.3; cursor: default; }
+    
+    .sentence-input { 
+      width: 100%; padding: 15px; border: 2px dashed #ccc; 
+      border-radius: 6px; min-height: 54px; font-size: 16px; 
+      color: var(--navy); background: #fff;
+    }
+
+    /* Typing Styles */
+    .typing-answer { width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 6px; font-size: 16px; outline: none; }
+    .typing-answer:focus { border-color: var(--accent); }
+
+    .btn-submit {
+      width: 100%; padding: 20px; background: var(--navy); color: white;
+      border: none; border-radius: 6px; font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px; font-weight: 800; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div id="timer-bar">
+  <div id="timer-display">30:00</div>
+  <div style="color: white; font-family: 'Barlow Condensed'">{{ session.full_name }} | ENGLISH MODULE</div>
+</div>
+
+<div class="container">
+  <div class="page-title">English Competency Test</div>
+  <div class="page-sub">Demonstrate your English skills by completing the following questions. Good luck!</div>
+  <form method="post" id="exam-form">
+    {% csrf_token %}
+    {% for question in questions %}
+      <input type="hidden" name="question_ids" value="{{ question.id }}">
+      <div class="question-card">
+        <div class="q-header">
+          <span class="q-type-label">{{ question.get_question_type_display }}</span>
+        </div>
+        <div class="q-body">
+          
+          {% if question.question_type == 'mcq' %}
+            <div class="q-text">{{ question.text }}</div>
+            <div class="mcq-options">
+              {% for val, label in question.options_list %} <!-- views.py da options_list qo'shish kerak -->
+                <div class="mcq-option">
+                  <input type="radio" name="q_{{ question.id }}" id="q{{ question.id }}_{{ val }}" value="{{ val }}">
+                  <label for="q{{ question.id }}_{{ val }}">{{ label }}</label>
+                </div>
+              {% endfor %}
+            </div>
+
+          {% elif question.question_type == 'scramble' %}
+            <div class="q-text">Build a correct sentence:</div>
+            <div class="word-pool" id="pool_{{ question.id }}">
+              <!-- JavaScript so'zlarni shu yerga generatsiya qiladi -->
+            </div>
+            <input type="text" class="sentence-input" name="q_{{ question.id }}" id="input_{{ question.id }}" readonly placeholder="Click words above to build...">
+            <button type="button" onclick="resetScramble('{{ question.id }}')" style="margin-top:10px; font-size:12px; border:none; background:none; color:var(--red); cursor:pointer;">↺ Reset Sentence</button>
+
+          {% else %}
+            <div class="q-text">{{ question.text }}</div>
+            <input type="text" class="typing-answer" name="q_{{ question.id }}" placeholder="Type your answer here...">
+          {% endif %}
+
+        </div>
+      </div>
+    {% endfor %}
+
+    <button type="submit" class="btn-submit">FINISH SESSION →</button>
+  </form>
+</div>
+
+<script>
+  // Timer logikasi o'zgarishsiz
+  let remaining = {{ exam_duration }};
+  const timerEl = document.getElementById('timer-display');
+  setInterval(() => {
+    remaining--;
+    const m = Math.floor(remaining/60).toString().padStart(2,'0');
+    const s = (remaining%60).toString().padStart(2,'0');
+    timerEl.textContent = `${m}:${s}`;
+    if (remaining <= 0) document.getElementById('exam-form').submit();
+  }, 1000);
+
+  // Scramble Logic
+  document.addEventListener('DOMContentLoaded', () => {
+    {% for question in questions %}
+      {% if question.question_type == 'scramble' %}
+        setupScramble("{{ question.id }}", "{{ question.text|escapejs }}");
+      {% endif %}
+    {% endfor %}
+  });
+
+  function setupScramble(id, text) {
+    const pool = document.getElementById(`pool_${id}`);
+    const words = text.split('/').map(w => w.trim());
+    // So'zlarni ekranda ko'rsatish uchun tasodifiy aralashtirish
+    words.sort(() => Math.random() - 0.5).forEach(word => {
+      const span = document.createElement('span');
+      span.className = 'word-item';
+      span.textContent = word;
+      span.onclick = () => {
+        if(!span.classList.contains('used')) {
+          const input = document.getElementById(`input_${id}`);
+          input.value += (input.value ? ' ' : '') + word;
+          span.classList.add('used');
+        }
+      };
+      pool.appendChild(span);
+    });
+  }
+
+  function resetScramble(id) {
+    document.getElementById(`input_${id}`).value = '';
+    document.querySelectorAll(`#pool_${id} .word-item`).forEach(el => el.classList.remove('used'));
+  }
+</script>
+</body>
+</html>

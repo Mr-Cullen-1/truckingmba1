@@ -15,6 +15,7 @@
       --navy: #0f1f38;
       --blue: #1a3c5e;
       --gold: #e8a020;
+      --accent: #6c5ce7; /* English session uchun binafsha rang */
       --light: #f4f6fa;
       --text: #1a1a2e;
       --gray: #888;
@@ -93,7 +94,6 @@
       max-width: 960px;
     }
 
-    /* CARD DYNAMIC HOVER EFFECT */
     .card {
       background: white;
       border-radius: 4px;
@@ -103,27 +103,22 @@
       flex-direction: column;
       position: relative;
       overflow: hidden;
-      /* Dinamik effekt uchun transition qo'shildi */
       transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      cursor: pointer;
     }
 
-    /* Sichqonchani olib borganda (Hover) */
     .card:hover {
-      transform: translateY(-10px); /* Tepaga ko'tarilish */
-      box-shadow: 0 15px 35px rgba(15,31,56,0.15); /* Soya kuchayishi */
+      transform: translateY(-10px);
+      box-shadow: 0 15px 35px rgba(15,31,56,0.15);
     }
 
     .card::before {
       content: '';
       position: absolute;
       top: 0; left: 0; width: 100%; height: 4px;
-      transition: height 0.3s ease; /* Hoverda chiziq qalinlashishi uchun */
+      transition: height 0.3s ease;
     }
     
-    .card:hover::before {
-      height: 8px; /* Hoverda rangli chiziq qalinlashadi */
-    }
+    .card:hover::before { height: 8px; }
 
     .card.logistics::before { background: var(--blue); }
     .card.qd::before { background: var(--gold); }
@@ -156,6 +151,16 @@
     }
     .btn-primary { background: var(--navy); color: white; }
     .btn-primary:hover { background: var(--blue); }
+    
+    /* English Session tugmasi uchun maxsus stil */
+    .btn-english { 
+      background: var(--accent); 
+      color: white; 
+    }
+    .btn-english:hover { 
+      background: var(--navy); 
+    }
+
     .btn-outline { border: 2px solid var(--navy); color: var(--navy); }
     .btn-outline:hover { background: var(--navy); color: white; }
     .btn-disabled { background: #e8e8e8; color: #b0b0b0; cursor: not-allowed; }
@@ -206,7 +211,8 @@
       <div class="card qd">
         <h2 class="card-title">QD & English</h2>
         <p class="card-desc">Advanced communication and quality assurance modules for logistics professionals.</p>
-        <div class="btn btn-disabled">English Session (Soon)</div>
+        <!-- Faollashtirilgan English Session tugmasi -->
+        <a href="{% url 'register_english' %}" class="btn btn-outline">English Session</a>
         <div class="btn btn-disabled">QD Mock Session (Soon)</div>
       </div>
     </div>

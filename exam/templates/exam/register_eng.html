@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trucking MBA — English Registration</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;800&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #0f1f38;
+      --blue: #1a3c5e;
+      --gold: #e8a020;
+      --light: #f4f6fa;
+      --white: #ffffff;
+    }
+    body { font-family: 'Barlow', sans-serif; background: var(--light); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+
+    .reg-card {
+      background: var(--white);
+      width: 100%;
+      max-width: 500px;
+      border-radius: 4px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .reg-header {
+      background: var(--navy);
+      padding: 30px 40px;
+      border-bottom: 5px solid var(--gold);
+    }
+    .brand-mini {
+      font-family: 'Barlow Condensed', sans-serif;
+      color: var(--gold);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .reg-header h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      color: var(--white);
+      font-size: 32px;
+      font-weight: 800;
+      text-transform: uppercase;
+      line-height: 1.1;
+    }
+
+    .reg-content { padding: 40px; }
+
+    .form-group { margin-bottom: 20px; }
+    label {
+      display: block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--navy);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #dde3ee;
+      border-radius: 2px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 15px;
+      background: #fcfdfe;
+    }
+
+    .module-choice { display: grid; gap: 10px; margin-top: 10px; }
+    .module-choice label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border: 1px solid #dde3ee;
+      border-radius: 3px;
+      cursor: pointer;
+      text-transform: none;
+      font-family: 'Barlow', sans-serif;
+      font-weight: 500;
+      font-size: 15px;
+      letter-spacing: 0;
+      color: var(--navy);
+      background: #fff;
+      margin-bottom: 0;
+    }
+    .module-choice input[type="radio"] { width: 18px; height: 18px; cursor: pointer; }
+
+    .btn-submit {
+      width: 100%;
+      padding: 18px;
+      background: var(--navy);
+      color: var(--white);
+      border: none;
+      border-radius: 3px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      margin-top: 10px;
+      transition: background 0.2s;
+    }
+    .btn-submit:hover { background: var(--blue); }
+
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 25px;
+      text-decoration: none;
+      color: #666;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="reg-card">
+    <div class="reg-header">
+      <div class="brand-mini">Trucking MBA</div>
+      <h2>English Session<br>Mock Registration</h2>
+    </div>
+    
+    <div class="reg-content">
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label>Student's Full Name</label>
+          {{ form.full_name }}
+        </div>
+        <div class="form-group">
+          <label>Teacher's Name (English)</label>
+          {{ form.teacher }}
+        </div>
+        <div class="form-group">
+          <label>Your Group</label>
+          {{ form.group }}
+        </div>
+        <div class="form-group">
+          <label>Choose Module</label>
+          <div class="module-choice">
+            {% for radio in form.departments %}
+                {% if radio.data.value == 'eng_mod2' or radio.data.value == 'eng_mod3' %}
+                    <!-- Module 2 va 3 ni bloklash qismi[cite: 5] -->
+                    <label style="opacity: 0.5; cursor: not-allowed; background: #f8f9fa; border-style: dashed;">
+                        <input type="radio" name="{{ radio.data.name }}" value="{{ radio.data.value }}" disabled>
+                        <span style="color: #888;">{{ radio.choice_label }} (Soon)</span>
+                    </label>
+                {% else %}
+                    <!-- Module 1 uchun standart qism[cite: 5] -->
+                    <label>
+                        {{ radio.tag }}
+                        <span>{{ radio.choice_label }}</span>
+                    </label>
+                {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+        <button type="submit" class="btn-submit">Proceed to Exam →</button>
+      </form>
+      <a href="{% url 'home' %}" class="back-link">← Back to Dashboard</a>
+    </div>
+  </div>
+</body>
+</html>

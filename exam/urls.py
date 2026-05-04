@@ -4,6 +4,10 @@ from . import views
 urlpatterns = [
     path('', views.index_view, name='home'),
     path('mock/register/', views.register_mock_view, name='register_mock'),
+    
+    # English Session uchun yangi yo'l
+    path('english/register/', views.register_english_view, name='register_english'),
+    
     path('final/access/', views.final_access_view, name='final_access'),
     path('final/register/', views.register_final_view, name='register_final'),
     path('exam/<int:session_id>/', views.exam_view, name='exam_start'),

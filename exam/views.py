@@ -11,16 +11,16 @@ import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment
 
 from .models import Question, ExamSession, Answer, DEPARTMENT_CHOICES
-from .forms import MockRegistrationForm, FinalRegistrationForm
+from .forms import MockRegistrationForm, FinalRegistrationForm, EnglishRegistrationForm
 
 # 1. ASOSIY SAHIFA
 def index_view(request):
     """3 ta bo'limli asosiy dashboard sahifasi"""
     return render(request, 'exam/index.html')
 
-# 2. MOCK REGISTRATION
+# 2. LOGISTICS MOCK REGISTRATION
 def register_mock_view(request):
-    """Mock Exam uchun ro'yxatdan o'tish"""
+    """Logistika Mock Exam uchun ro'yxatdan o'tish[cite: 2]"""
     if request.method == 'POST':
         form = MockRegistrationForm(request.POST)
         if form.is_valid():
@@ -37,9 +37,30 @@ def register_mock_view(request):
         'subtitle': 'Mock Registration'
     })
 
-# 3. FINAL EXAM KODINI TEKSHIRISH (O'QITUVCHI LOGINI)
+# 3. ENGLISH SESSION REGISTRATION (YANGI)
+def register_english_view(request):
+    """Ingliz tili sessiyasi uchun alohida ro'yxatdan o'tish[cite: 3]"""
+    if request.method == 'POST':
+        form = EnglishRegistrationForm(request.POST)
+        if form.is_valid():
+            session = form.save(commit=False)
+            session.exam_type = 'mock' # English sessionlar mock sifatida saqlanadi
+            session.exam_date = timezone.now().date()
+            # ChoiceField bitta string qiymat qaytaradi
+            session.save()
+            return redirect('exam_start', session_id=session.id)
+    else:
+        form = EnglishRegistrationForm()
+    
+    return render(request, 'exam/register_eng.html', {
+        'form': form,
+        'title': 'English Session',
+        'subtitle': 'Registration & Module Selection'
+    })
+
+# 4. FINAL EXAM KODINI TEKSHIRISH
 def final_access_view(request):
-    """Final Examga kirish uchun o'qituvchi loginini tekshirish"""
+    """Final Examga kirish uchun o'qituvchi loginini tekshirish[cite: 2]"""
     if request.method == 'POST':
         u = request.POST.get('username')
         p = request.POST.get('password')
@@ -51,9 +72,9 @@ def final_access_view(request):
             messages.error(request, "O'qituvchi login yoki paroli xato!")
     return render(request, 'exam/final_access.html')
 
-# 4. FINAL REGISTRATION
+# 5. FINAL REGISTRATION
 def register_final_view(request):
-    """Final Exam uchun ro'yxatdan o'tish[cite: 3]"""
+    """Logistika Final Exam uchun ro'yxatdan o'tish[cite: 2]"""
     if not request.session.get('final_allowed'):
         return redirect('final_access')
     if request.method == 'POST':
@@ -72,11 +93,12 @@ def register_final_view(request):
         'subtitle': 'Official Certification'
     })
 
-# 5. IMTIHON JARAYONI (6+4+2 MANTIQI)
+# 6. IMTIHON JARAYONI (6+4+2 VA 10+5+5)
 @ensure_csrf_cookie
 def exam_view(request, session_id):
-    """Savollarni tasodifiy saralash va imtihon jarayoni[cite: 3]"""
+    """Savollarni tasodifiy saralash va imtihon jarayoni[cite: 2]"""
     session = get_object_or_404(ExamSession, id=session_id, is_complete=False)
+    
     if request.method == 'POST':
         question_ids = request.POST.getlist('question_ids')
         for q_id in question_ids:
@@ -96,38 +118,62 @@ def exam_view(request, session_id):
         return redirect('exam_done')
 
     selected_depts = session.get_departments_list()
-    mcq_qs = []
-    if selected_depts:
-        per_dept = 6 // len(selected_depts)
-        for d in selected_depts:
-            qs = list(Question.objects.filter(department=d, question_type='mcq', is_active=True))
-            if qs: mcq_qs.extend(random.sample(qs, min(per_dept, len(qs))))
+    is_english = any(d.startswith('eng_') for d in selected_depts)
     
-    if len(mcq_qs) < 6:
-        rem = 6 - len(mcq_qs)
-        extra = list(Question.objects.filter(department__in=selected_depts, question_type='mcq', is_active=True).exclude(id__in=[q.id for q in mcq_qs]))
-        if extra: mcq_qs.extend(random.sample(extra, min(rem, len(extra))))
+    all_qs = []
 
-    open_pool = list(Question.objects.filter(department__in=selected_depts, question_type='open', is_active=True))
-    open_qs = random.sample(open_pool, min(4, len(open_pool))) if open_pool else []
-    
-    career_pool = list(Question.objects.filter(department='career', is_active=True))
-    career_qs = random.sample(career_pool, min(2, len(career_pool))) if career_pool else []
-    
-    all_qs = mcq_qs + open_qs + career_qs
+    if is_english:
+        # INGLIZ TILI LOGIKASI (10+5+5)[cite: 3]
+        for d in selected_depts:
+            if d.startswith('eng_'):
+                mcqs = list(Question.objects.filter(department=d, question_type='mcq', is_active=True))
+                all_qs.extend(random.sample(mcqs, min(10, len(mcqs))))
+                
+                opens = list(Question.objects.filter(department=d, question_type='open', is_active=True))
+                all_qs.extend(random.sample(opens, min(5, len(opens))))
+                
+                scrambles = list(Question.objects.filter(department=d, question_type='scramble', is_active=True))
+                all_qs.extend(random.sample(scrambles, min(5, len(scrambles))))
+        
+        template_name = 'exam/exam_eng.html'
+        exam_time = 30 * 60
+    else:
+        # LOGISTIKA LOGIKASI (6+4+2)[cite: 2]
+        mcq_qs = []
+        if selected_depts:
+            per_dept = 6 // len(selected_depts)
+            for d in selected_depts:
+                qs = list(Question.objects.filter(department=d, question_type='mcq', is_active=True))
+                if qs: mcq_qs.extend(random.sample(qs, min(per_dept, len(qs))))
+        
+        if len(mcq_qs) < 6:
+            rem = 6 - len(mcq_qs)
+            extra = list(Question.objects.filter(department__in=selected_depts, question_type='mcq', is_active=True).exclude(id__in=[q.id for q in mcq_qs]))
+            if extra: mcq_qs.extend(random.sample(extra, min(rem, len(extra))))
+
+        open_pool = list(Question.objects.filter(department__in=selected_depts, question_type='open', is_active=True))
+        open_qs = random.sample(open_pool, min(4, len(open_pool))) if open_pool else []
+        
+        career_pool = list(Question.objects.filter(department='career', is_active=True))
+        career_qs = random.sample(career_pool, min(2, len(career_pool))) if career_pool else []
+        
+        all_qs = mcq_qs + open_qs + career_qs
+        template_name = 'exam/exam.html'
+        exam_time = 20 * 60
+
     all_qs.sort(key=lambda q: q.order)
 
-    return render(request, 'exam/exam.html', {
+    return render(request, template_name, {
         'session': session,
         'questions': all_qs,
-        'exam_duration': 20 * 60,
+        'exam_duration': exam_time,
         'warning_time': 5 * 60,
     })
 
-# 6. TEACHER'S PANEL (ADMIN RESULTS)
+# 7. TEACHER'S PANEL (ADMIN RESULTS)
 @login_required(login_url='/admin/login/')
 def admin_results_view(request):
-    """Natijalarni ko'rsatish va doimiy login so'rash mantiqi[cite: 3, 8]"""
+    """Natijalarni ko'rsatish[cite: 2]"""
     if not request.user.is_staff:
         return redirect('home')
 
@@ -152,13 +198,13 @@ def admin_results_view(request):
         })
     
     response = render(request, 'exam/admin_results.html', {'rows': rows})
-    logout(request) # Panel ko'ringach foydalanuvchini logout qilish[cite: 3]
+    logout(request) 
     return response
 
-# 7. EXCEL EXPORT
+# 8. EXCEL EXPORT
 @staff_member_required
 def export_excel_view(request):
-    """Barcha natijalarni Excelga yuklash[cite: 3]"""
+    """Natijalarni Excelga yuklash[cite: 2]"""
     sessions = ExamSession.objects.prefetch_related('answers__question').all()
     dept_map = dict(DEPARTMENT_CHOICES)
     
@@ -171,7 +217,7 @@ def export_excel_view(request):
     top_align = Alignment(vertical="top", wrap_text=True)
 
     headers = ["Type", "Full Name", "Phone", "Date", "Group", "Teacher", "Departments"]
-    for i in range(1, 13): headers.append(f"Q&A {i}")
+    for i in range(1, 25): headers.append(f"Q&A {i}") # Ustunlarni 24 taga kengaytirdik
 
     for col, h in enumerate(headers, 1):
         cell = ws.cell(row=1, column=col, value=h)
@@ -189,7 +235,7 @@ def export_excel_view(request):
 
         ans_col = 8
         for ans in session.answers.select_related('question').all().order_by('question__order'):
-            if ans_col > 19: break
+            if ans_col > 31: break
             std_ans = ans.selected_option.upper() if ans.selected_option else ans.answer_text
             ws.cell(row=row_num, column=ans_col, value=f"Q: {ans.question.text}\n\nA: {std_ans}").alignment = top_align
             ans_col += 1
@@ -199,7 +245,7 @@ def export_excel_view(request):
     wb.save(response)
     return response
 
-# 8. DONE VIEW
+# 9. DONE VIEW
 def done_view(request):
-    """Imtihon topshirib bo'lingandagi sahifa[cite: 3]"""
+    """Imtihon yakunlangandagi sahifa[cite: 2]"""
     return render(request, 'exam/done.html')
