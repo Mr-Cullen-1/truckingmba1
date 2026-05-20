@@ -6,206 +6,378 @@
   <title>Trucking MBA — Registration</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;800&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/themes/dark.css">
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
     :root {
-      --navy: #0f1f38;
-      --blue: #1a3c5e;
-      --gold: #e8a020;
-      --light: #f4f6fa;
-      --text: #1a1a2e;
+      --bg-dark: #121214;
+      --card-bg: #1e1e22;
+      --gold-primary: #d4af37;
+      --gold-gradient: linear-gradient(135deg, #f3e5ab 0%, #d4af37 50%, #aa7c11 100%);
+      --gold-btn: linear-gradient(90deg, #e5c060, #b8860b);
+      --text-light: #ffffff;
+      --text-muted: #a0a0a5;
+      --input-bg: #26262b;
+      --border-color: rgba(212, 175, 55, 0.15);
     }
+
     body {
       font-family: 'Barlow', sans-serif;
-      background: var(--light);
+      background-color: var(--bg-dark);
+      background-image: 
+        linear-gradient(135deg, rgba(18, 18, 20, 0.95) 0%, rgba(26, 26, 30, 0.98) 100%),
+        radial-gradient(circle at 80% 20%, rgba(212, 175, 55, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 10% 80%, rgba(170, 124, 17, 0.05) 0%, transparent 50%);
       min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      color: var(--text-light);
+    }
+
+    /* FORM CONTAINER (MAIN) */
+    main {
+      flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 40px 16px;
+      padding: 60px 16px;
     }
+
     .card {
-      background: white;
-      border-radius: 4px;
-      box-shadow: 0 8px 40px rgba(15,31,56,0.13);
+      background: var(--card-bg);
+      border-radius: 6px;
+      border: 1px solid rgba(212, 175, 55, 0.1);
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5);
       width: 100%;
       max-width: 540px;
       overflow: hidden;
+      transition: border-color 0.3s;
     }
+
+    .card:hover {
+      border-color: rgba(212, 175, 55, 0.25);
+    }
+
+    /* CARD HEADER */
     .card-header {
-      background: var(--navy);
-      padding: 36px 40px 28px;
+      background: rgba(30, 30, 34, 0.6);
+      padding: 40px 40px 30px;
       position: relative;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+      text-align: center;
     }
+    
     .card-header::after {
       content: '';
       position: absolute;
-      bottom: 0; left: 0; right: 0;
-      height: 4px;
-      background: var(--gold);
+      bottom: -1px; left: 0; right: 0;
+      height: 2px;
+      background: var(--gold-gradient);
     }
+
     .logo {
       font-family: 'Barlow Condensed', sans-serif;
-      color: var(--gold);
-      font-size: 13px;
+      color: var(--gold-primary);
+      font-size: 14px;
       font-weight: 600;
-      letter-spacing: 3px;
+      letter-spacing: 4px;
       text-transform: uppercase;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
+
     h1 {
       font-family: 'Barlow Condensed', sans-serif;
-      color: white;
-      font-size: 32px;
+      background: var(--gold-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 34px;
       font-weight: 800;
       line-height: 1.1;
       text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    .card-body { padding: 36px 40px; }
-    .field { margin-bottom: 22px; }
+
+    /* CARD BODY */
+    .card-body { 
+      padding: 40px; 
+    }
+
+    .field { 
+      margin-bottom: 25px; 
+    }
+
     .field > label {
       display: block;
       font-size: 12px;
       font-weight: 600;
       letter-spacing: 1.5px;
       text-transform: uppercase;
-      color: var(--blue);
-      margin-bottom: 7px;
+      color: var(--gold-primary);
+      margin-bottom: 8px;
     }
+
+    /* INPUTS STYLING */
     input[type=text],
     input[type=date],
     input[type=tel],
     input[type=email],
     input[type=number] {
       width: 100%;
-      padding: 12px 16px;
-      border: 2px solid #dde3ee;
-      border-radius: 3px;
+      padding: 14px 18px;
+      background: var(--input-bg);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
       font-family: 'Barlow', sans-serif;
       font-size: 15px;
-      color: var(--text);
-      transition: border-color 0.2s;
+      color: var(--text-light);
+      transition: all 0.3s ease;
       outline: none;
     }
-    input:focus { border-color: var(--blue); }
 
-    /* Department checkboxes grid */
+    input:focus { 
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.15);
+      background: #2a2a30;
+    }
+
+    /* CHECKBOXES GRID (DEPARTMENTS) */
     .dept-hint {
       font-size: 13px;
-      color: #888;
-      margin-bottom: 12px;
+      color: var(--text-muted);
+      margin-bottom: 15px;
     }
+
     .dept-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
+      gap: 12px;
     }
+
     .dept-check {
       display: flex;
       align-items: center;
-      gap: 10px;
-      padding: 11px 14px;
-      border: 2px solid #dde3ee;
-      border-radius: 3px;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--input-bg);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
       cursor: pointer;
       font-size: 15px;
       font-weight: 500;
-      color: var(--text);
-      transition: all 0.15s;
+      color: var(--text-light);
+      transition: all 0.2s ease;
       user-select: none;
     }
+
     .dept-check input[type=checkbox] {
-      width: 17px;
-      height: 17px;
-      accent-color: var(--blue);
+      width: 18px;
+      height: 18px;
+      accent-color: var(--gold-primary);
       cursor: pointer;
       flex-shrink: 0;
     }
-    /* Tanlanganda ko'rinishi */
-    .dept-check:has(input:checked) {
-      border-color: var(--blue);
-      background: #edf2fa;
+
+    .dept-check:hover {
+      border-color: rgba(212, 175, 55, 0.3);
+      background: #2b2b30;
     }
 
+    .dept-check:has(input:checked) {
+      border-color: var(--gold-primary);
+      background: rgba(212, 175, 55, 0.08);
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.05);
+    }
+
+    /* ACTION BUTTON */
     .btn {
       width: 100%;
       padding: 16px;
-      background: var(--navy);
-      color: white;
+      background: var(--gold-btn);
+      color: #0f1013;
       border: none;
-      border-radius: 3px;
+      border-radius: 4px;
       font-family: 'Barlow Condensed', sans-serif;
       font-size: 18px;
       font-weight: 700;
-      letter-spacing: 1px;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
       cursor: pointer;
-      transition: background 0.2s;
-      margin-top: 8px;
+      transition: all 0.3s ease;
+      margin-top: 15px;
     }
-    .btn:hover { background: var(--blue); }
+
+    .btn:hover { 
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+      transform: scale(1.01);
+    }
     
+    /* ERRORS */
     .errorlist {
-      color: #c0392b;
-      font-size: 12px;
-      margin-top: 6px;
+      color: #ff4a4a;
+      font-size: 13px;
+      margin-top: 8px;
       list-style: none;
       padding-left: 0;
     }
+
+    /* BACK LINK */
     .back-link {
       display: block;
       text-align: center;
-      margin-top: 20px;
+      margin-top: 25px;
       font-size: 13px;
-      color: var(--gray);
+      color: var(--text-muted);
       text-decoration: none;
+      letter-spacing: 0.5px;
+      transition: color 0.2s;
     }
-    .back-link:hover { color: var(--navy); }
+
+    .back-link:hover { 
+      color: var(--gold-primary); 
+    }
+
+    /* FOOTER */
+    footer {
+      background: #0b0b0c;
+      color: var(--text-muted);
+      padding: 20px 40px;
+      text-align: center;
+      border-top: 1px solid rgba(255, 255, 255, 0.03);
+    }
+
+    .footer-content {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 25px;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    /* ==========================================================================
+       FLATPICKR KALENDAR CUSTOM PREMIUM STYLE
+       ========================================================================== */
+    .flatpickr-calendar {
+      background: #1e1e22 !important;
+      border: 1px solid rgba(212, 175, 55, 0.3) !important;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.6) !important;
+      font-family: 'Barlow', sans-serif !important;
+    }
+    /* Kalendar tepasidagi oylar va strelkalar */
+    .flatpickr-months .flatpickr-month, 
+    .flatpickr-months .flatpickr-prev-month, 
+    .flatpickr-months .flatpickr-next-month {
+      color: var(--gold-primary) !important;
+      fill: var(--gold-primary) !important;
+    }
+    .flatpickr-current-month .numInputWrapper span.arrowUp:after { border-bottom-color: var(--gold-primary) !important; }
+    .flatpickr-current-month .numInputWrapper span.arrowDown:after { border-top-color: var(--gold-primary) !important; }
+    
+    /* Hafta kunlari (Dsh, Ssh...) */
+    span.flatpickr-weekday {
+      color: var(--text-muted) !important;
+      font-weight: 600 !important;
+    }
+    /* Kunlar katakchalari */
+    .flatpickr-day {
+      color: var(--text-light) !important;
+      border-radius: 4px !important;
+      transition: all 0.2s ease;
+    }
+    /* Sichqoncha ustiga kelganda */
+    .flatpickr-day:hover, .flatpickr-day:focus {
+      background: rgba(212, 175, 55, 0.15) !important;
+      border-color: var(--gold-primary) !important;
+      color: #fff !important;
+    }
+    /* Sana tanlangan holati */
+    .flatpickr-day.selected, .flatpickr-day.selected:hover {
+      background: var(--gold-btn) !important;
+      border-color: transparent !important;
+      color: #0f1013 !important;
+      font-weight: 700 !important;
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+    }
+    /* Boshqa oyga tegishli kunlar */
+    .flatpickr-day.prevMonthDay, .flatpickr-day.nextMonthDay {
+      color: rgba(255, 255, 255, 0.15) !important;
+    }
+    /* Bugungi kun konturi */
+    .flatpickr-day.today {
+      border-color: rgba(212, 175, 55, 0.5) !important;
+    }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="card-header">
-      <div class="logo">Trucking MBA</div>
-      <!-- Dinamik sarlavha: Practice Session yoki Final Exam[cite: 3, 6] -->
-      <h1>{{ title }}<br>{{ subtitle }}</h1>
+
+  <main>
+    <div class="card">
+      <div class="card-header">
+        <div class="logo">Trucking MBA</div>
+        <h1>{{ title }}<br>{{ subtitle }}</h1>
+      </div>
+      <div class="card-body">
+        <form method="post">
+          {% csrf_token %}
+
+          {% for field in form %}
+            <div class="field">
+              <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+
+              {% if field.html_name == 'departments' %}
+                <p class="dept-hint">Select all departments you studied.</p>
+                <div class="dept-grid">
+                  {% for checkbox in field %}
+                    <label class="dept-check">
+                      {{ checkbox.tag }}
+                      <span>{{ checkbox.choice_label }}</span>
+                    </label>
+                  {% endfor %}
+                </div>
+              {% else %}
+                {{ field }}
+              {% endif %}
+
+              {% if field.errors %}
+                <ul class="errorlist">
+                  {% for error in field.errors %}
+                    <li>{{ error }}</li>
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            </div>
+          {% endfor %}
+
+          <button type="submit" class="btn">Proceed to Exam →</button>
+          <a href="{% url 'home' %}" class="back-link">← Back to Dashboard</a>
+        </form>
+      </div>
     </div>
-    <div class="card-body">
-      <form method="post">
-        {% csrf_token %}
+  </main>
 
-        {% for field in form %}
-          <div class="field">
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-
-            {% if field.html_name == 'departments' %}
-              <p class="dept-hint">Select all departments you studied.</p>
-              <div class="dept-grid">
-                {% for checkbox in field %}
-                  <label class="dept-check">
-                    {{ checkbox.tag }}
-                    <span>{{ checkbox.choice_label }}</span>
-                  </label>
-                {% endfor %}
-              </div>
-            {% else %}
-              {{ field }}
-            {% endif %}
-
-            {% if field.errors %}
-              <ul class="errorlist">
-                {% for error in field.errors %}
-                  <li>{{ error }}</li>
-                {% endfor %}
-              </ul>
-            {% endif %}
-          </div>
-        {% endfor %}
-
-        <button type="submit" class="btn">Proceed to Exam →</button>
-        <a href="{% url 'home' %}" class="back-link">← Back to Dashboard</a>
-      </form>
+  <footer>
+    <div class="footer-content">
+      <span>&copy; 2026 Trucking MBA School</span>
+      <span>All rights reserved</span>
+      <span style="color: var(--gold-primary); opacity: 0.8;">Premium Logistics Education</span>
     </div>
-  </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // Django formasidagi 'date' tipidagi inputga zamonaviy kalendarni bog'laymiz
+      flatpickr("input[type='date']", {
+        dateFormat: "Y-m-d", // Django modeliga mos standart format
+        animate: true,
+        disableMobile: "true" // Mobil qurilmalarda ham dizayn buzilmasligi uchun
+      });
+    });
+  </script>
+
 </body>
 </html>

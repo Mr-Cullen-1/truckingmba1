@@ -7,115 +7,205 @@
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;800&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
     :root {
-      --navy: #0f1f38;
-      --blue: #1a3c5e;
-      --gold: #e8a020;
-      --light: #f4f6fa;
-      --white: #ffffff;
+      --bg-dark: #121214;
+      --card-bg: #1e1e22;
+      --gold-primary: #d4af37;
+      --gold-gradient: linear-gradient(135deg, #f3e5ab 0%, #d4af37 50%, #aa7c11 100%);
+      --gold-btn: linear-gradient(90deg, #e5c060, #b8860b);
+      --text-light: #ffffff;
+      --text-muted: #a0a0a5;
+      --input-bg: #26262b;
+      --border-color: rgba(212, 175, 55, 0.15);
     }
-    body { font-family: 'Barlow', sans-serif; background: var(--light); display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 20px; }
+
+    body { 
+      font-family: 'Barlow', sans-serif; 
+      /* Boshqa sahifalar bilan bir xil premium geometrik fon */
+      background-color: var(--bg-dark);
+      background-image: 
+        linear-gradient(135deg, rgba(18, 18, 20, 0.95) 0%, rgba(26, 26, 30, 0.98) 100%),
+        radial-gradient(circle at 80% 20%, rgba(212, 175, 55, 0.08) 0%, transparent 40%),
+        radial-gradient(circle at 10% 80%, rgba(170, 124, 17, 0.05) 0%, transparent 50%);
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center; 
+      min-height: 100vh; 
+      padding: 40px 16px; 
+      color: var(--text-light);
+    }
 
     .reg-card {
-      background: var(--white);
+      background: var(--card-bg);
       width: 100%;
       max-width: 500px;
-      border-radius: 4px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+      border-radius: 6px;
+      border: 1px solid rgba(212, 175, 55, 0.1);
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5);
       overflow: hidden;
+      transition: border-color 0.3s;
     }
 
-    .reg-header {
-      background: var(--navy);
-      padding: 30px 40px;
-      border-bottom: 5px solid var(--gold);
+    .reg-card:hover {
+      border-color: rgba(212, 175, 55, 0.25);
     }
+
+    /* CARD HEADER */
+    .reg-header {
+      background: rgba(30, 30, 34, 0.6);
+      padding: 40px 40px 30px;
+      position: relative;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+      text-align: center;
+    }
+    
+    .reg-header::after {
+      content: '';
+      position: absolute;
+      bottom: -1px; left: 0; right: 0;
+      height: 2px;
+      background: var(--gold-gradient);
+    }
+
     .brand-mini {
       font-family: 'Barlow Condensed', sans-serif;
-      color: var(--gold);
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 2px;
+      color: var(--gold-primary);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 4px;
       text-transform: uppercase;
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
+    
     .reg-header h2 {
       font-family: 'Barlow Condensed', sans-serif;
-      color: var(--white);
-      font-size: 32px;
+      background: var(--gold-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 34px;
       font-weight: 800;
       text-transform: uppercase;
       line-height: 1.1;
+      letter-spacing: 0.5px;
     }
 
+    /* CARD CONTENT */
     .reg-content { padding: 40px; }
 
-    .form-group { margin-bottom: 20px; }
+    .form-group { margin-bottom: 25px; }
+    
     label {
       display: block;
       font-family: 'Barlow Condensed', sans-serif;
-      font-weight: 700;
-      font-size: 14px;
-      color: var(--navy);
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--gold-primary);
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 1.5px;
       margin-bottom: 8px;
     }
+
+    /* TEXT INPUTS STYLING */
     input[type="text"] {
       width: 100%;
-      padding: 12px 16px;
-      border: 1px solid #dde3ee;
-      border-radius: 2px;
+      padding: 14px 18px;
+      background: var(--input-bg);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
       font-family: 'Barlow', sans-serif;
       font-size: 15px;
-      background: #fcfdfe;
+      color: var(--text-light);
+      transition: all 0.3s ease;
+      outline: none;
     }
 
-    .module-choice { display: grid; gap: 10px; margin-top: 10px; }
+    input[type="text"]:focus {
+      border-color: var(--gold-primary);
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.15);
+      background: #2a2a30;
+    }
+
+    /* MODULE CHOICE (RADIO GRID) */
+    .module-choice { display: grid; gap: 12px; margin-top: 10px; }
+    
     .module-choice label {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 12px 16px;
-      border: 1px solid #dde3ee;
-      border-radius: 3px;
+      padding: 14px 16px;
+      background: var(--input-bg);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
       cursor: pointer;
       text-transform: none;
       font-family: 'Barlow', sans-serif;
       font-weight: 500;
       font-size: 15px;
       letter-spacing: 0;
-      color: var(--navy);
-      background: #fff;
+      color: var(--text-light);
       margin-bottom: 0;
+      transition: all 0.2s ease;
     }
-    .module-choice input[type="radio"] { width: 18px; height: 18px; cursor: pointer; }
+    
+    .module-choice label:hover:not([style*="disabled"]) {
+      border-color: rgba(212, 175, 55, 0.3);
+      background: #2b2b30;
+    }
 
+    /* Radio tugmachasining umumiy tillarang stili */
+    .module-choice input[type="radio"] { 
+      width: 18px; 
+      height: 18px; 
+      accent-color: var(--gold-primary);
+      cursor: pointer; 
+    }
+
+    /* Faol modul tanlanganda uning atrofini tillarang qilish (CSS selector) */
+    .module-choice label:has(input[type="radio"]:checked) {
+      border-color: var(--gold-primary);
+      background: rgba(212, 175, 55, 0.08);
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.05);
+    }
+
+    /* ACTION BUTTON */
     .btn-submit {
       width: 100%;
-      padding: 18px;
-      background: var(--navy);
-      color: var(--white);
+      padding: 16px;
+      background: var(--gold-btn);
+      color: #0f1013;
       border: none;
-      border-radius: 3px;
+      border-radius: 4px;
       font-family: 'Barlow Condensed', sans-serif;
       font-size: 18px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 1px;
+      letter-spacing: 1.5px;
       cursor: pointer;
-      margin-top: 10px;
-      transition: background 0.2s;
+      margin-top: 15px;
+      transition: all 0.3s ease;
     }
-    .btn-submit:hover { background: var(--blue); }
+    
+    .btn-submit:hover { 
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+      transform: scale(1.01);
+    }
 
+    /* BACK LINK */
     .back-link {
       display: block;
       text-align: center;
       margin-top: 25px;
       text-decoration: none;
-      color: #666;
+      color: var(--text-muted);
       font-size: 13px;
+      letter-spacing: 0.5px;
+      transition: color 0.2s;
+    }
+    
+    .back-link:hover { 
+      color: var(--gold-primary); 
     }
   </style>
 </head>
@@ -146,13 +236,11 @@
           <div class="module-choice">
             {% for radio in form.departments %}
                 {% if radio.data.value == 'eng_mod2' or radio.data.value == 'eng_mod3' %}
-                    <!-- Module 2 va 3 ni bloklash qismi[cite: 5] -->
-                    <label style="opacity: 0.5; cursor: not-allowed; background: #f8f9fa; border-style: dashed;">
+                    <label style="opacity: 0.35; cursor: not-allowed; background: rgba(255,255,255,0.02); border-style: dashed; border-color: rgba(255,255,255,0.1);">
                         <input type="radio" name="{{ radio.data.name }}" value="{{ radio.data.value }}" disabled>
-                        <span style="color: #888;">{{ radio.choice_label }} (Soon)</span>
+                        <span style="color: var(--text-muted);">{{ radio.choice_label }} (Soon)</span>
                     </label>
                 {% else %}
-                    <!-- Module 1 uchun standart qism[cite: 5] -->
                     <label>
                         {{ radio.tag }}
                         <span>{{ radio.choice_label }}</span>

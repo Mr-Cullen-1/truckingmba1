@@ -2,97 +2,189 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Trucking MBA — Admin Results</title>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Barlow', sans-serif; background: #f4f6fa; color: #1a1a2e; }
+    
+    :root {
+      --bg-dark: #121214;
+      --card-bg: #1e1e22;
+      --gold-primary: #d4af37;
+      --gold-gradient: linear-gradient(135deg, #f3e5ab 0%, #d4af37 50%, #aa7c11 100%);
+      --gold-btn: linear-gradient(90deg, #e5c060, #b8860b);
+      --text-light: #ffffff;
+      --text-muted: #a0a0a5;
+      --input-bg: #26262b;
+      --grid-gap-color: #2a2a30;
+
+      /* Departamentlarning To'q fonga moslangan neon ranglari */
+      --color-career: #d4af37;
+      --color-dispatch: #00a2ff;
+      --color-safety: #2ecc71;
+      --color-fleet: #9b59b6;
+      --color-accounting: #1abc9c;
+      --color-recruiting: #e67e22;
+      --color-update: #e74c3c;
+    }
+
+    body { 
+      font-family: 'Barlow', sans-serif; 
+      background-color: var(--bg-dark);
+      background-image: 
+        linear-gradient(135deg, rgba(18, 18, 20, 0.95) 0%, rgba(26, 26, 30, 0.98) 100%);
+      color: var(--text-light); 
+      min-height: 100vh;
+    }
+
+    /* TOPBAR HEADER */
     .topbar {
-      background: #0f1f38; padding: 18px 32px;
+      background: rgba(30, 30, 34, 0.85);
+      backdrop-filter: blur(12px);
+      padding: 18px 32px;
       display: flex; align-items: center; justify-content: space-between;
       position: sticky; top: 0; z-index: 100;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.15);
     }
+    
     .topbar h1 {
       font-family: 'Barlow Condensed', sans-serif;
-      color: white; font-size: 24px; font-weight: 800;
+      background: var(--gold-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 26px; font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    .topbar-links { display: flex; gap: 12px; align-items: center; }
+    
+    .topbar-links { display: flex; gap: 14px; align-items: center; }
+    
+    /* EXPORT EXCEL BUTTON */
     .btn-export {
-      padding: 10px 24px;
-      background: #e8a020; color: #0f1f38;
-      border: none; border-radius: 3px;
+      padding: 11px 24px;
+      background: var(--gold-btn); color: #0f1013;
+      border: none; border-radius: 4px;
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: 16px; font-weight: 700;
+      font-size: 15px; font-weight: 700;
       cursor: pointer; text-decoration: none;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      transition: all 0.3s ease;
     }
+    .btn-export:hover { 
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+      transform: scale(1.02);
+    }
+    
+    /* BACK TO PORTAL BUTTON */
     .btn-admin {
-      padding: 10px 24px;
-      background: rgba(255,255,255,0.1); color: white;
-      border: none; border-radius: 3px;
+      padding: 11px 24px;
+      background: transparent; color: var(--text-muted);
+      border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 4px;
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: 16px; font-weight: 700;
+      font-size: 15px; font-weight: 700;
       cursor: pointer; text-decoration: none;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      transition: all 0.3s ease;
     }
-    .container { padding: 32px; }
+    .btn-admin:hover { 
+      border-color: #fff; color: #fff; 
+      background: rgba(255, 255, 255, 0.02);
+    }
 
-    /* Session cards */
+    /* MAIN CONTAINER */
+    .container { padding: 40px 32px; }
+
+    /* SESSION CARD */
     .session-card {
-      background: white; border-radius: 4px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
-      margin-bottom: 32px; overflow: hidden;
+      background: var(--card-bg); border-radius: 6px;
+      border: 1px solid rgba(212, 175, 55, 0.1);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.4);
+      margin-bottom: 40px; overflow: hidden;
     }
+    
     .session-header {
-      background: #0f1f38; padding: 16px 24px;
+      background: rgba(255, 255, 255, 0.02); padding: 20px 24px;
       display: flex; align-items: center; gap: 24px; flex-wrap: wrap;
+      border-bottom: 1px solid rgba(215, 175, 55, 0.15);
     }
+    
     .s-name {
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: 22px; font-weight: 800; color: white;
+      font-size: 24px; font-weight: 800; color: var(--text-light);
+      text-transform: uppercase; letter-spacing: 0.5px;
     }
-    .s-meta { font-size: 13px; color: rgba(255,255,255,0.65); }
+    
+    .s-meta { font-size: 14px; color: var(--text-muted); margin-top: 4px; }
+    
     .s-depts {
       margin-left: auto;
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: 13px; font-weight: 600; letter-spacing: 1px;
-      color: #e8a020; text-transform: uppercase;
+      font-size: 14px; font-weight: 600; letter-spacing: 1px;
+      color: var(--gold-primary); text-transform: uppercase;
     }
+    
+    /* STATUS BADGES */
     .s-badge {
-      padding: 4px 12px; border-radius: 2px;
+      padding: 5px 14px; border-radius: 4px;
       font-family: 'Barlow Condensed', sans-serif;
       font-size: 12px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase;
     }
-    .badge-yes { background: #27ae60; color: white; }
-    .badge-no  { background: #e74c3c; color: white; }
+    .badge-yes { background: rgba(46, 204, 113, 0.15); color: #2ecc71; border: 1px solid rgba(46, 204, 113, 0.3); }
+    .badge-no  { background: rgba(231, 76, 60, 0.15); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.3); }
 
-    /* Natijalar gridi */
+    /* ANSWERS GRID */
     .answers-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-      gap: 1px; background: #edf0f7;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 1px; background: var(--grid-gap-color);
     }
+    
     .answer-item {
-      background: white; padding: 20px;
-      display: flex; flex-direction: column; gap: 10px;
+      background: var(--card-bg); padding: 24px;
+      display: flex; flex-direction: column; gap: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.02);
     }
+    
     .q-head { display: flex; justify-content: space-between; align-items: center; }
+    
+    /* Dinamik darslik teglari (Badge) */
     .dept-tag {
-      padding: 2px 8px; border-radius: 2px;
+      padding: 3px 10px; border-radius: 3px;
       font-size: 10px; font-weight: 700; letter-spacing: 1px;
-      text-transform: uppercase; color: white;
-      background: #1a3c5e;
+      text-transform: uppercase; color: #0f1013;
+      background: var(--gold-primary);
     }
-    .q-title { font-weight: 700; font-size: 14px; color: #1a1a2e; }
-    .q-text { font-size: 13px; color: #555; line-height: 1.5; font-style: italic; }
+    
+    /* Dinamik dars ranglarini grid elementlari taglariga qo'llash */
+    .answer-item:has(.dept-tag:contains('Dispatch')) .dept-tag { background: var(--color-dispatch); color: #000; }
+    .answer-item:has(.dept-tag:contains('Update')) .dept-tag { background: var(--color-update); color: #fff; }
+    .answer-item:has(.dept-tag:contains('Safety')) .dept-tag { background: var(--color-safety); color: #000; }
+    .answer-item:has(.dept-tag:contains('Fleet')) .dept-tag { background: var(--color-fleet); color: #fff; }
+    .answer-item:has(.dept-tag:contains('Accounting')) .dept-tag { background: var(--color-accounting); color: #000; }
+    .answer-item:has(.dept-tag:contains('Recruiting')) .dept-tag { background: var(--color-recruiting); color: #000; }
+    .answer-item:has(.dept-tag:contains('Career')) .dept-tag { background: var(--color-career); color: #000; }
+    
+    .q-title { font-weight: 600; font-size: 14px; color: var(--gold-primary); }
+    .q-text { font-size: 14px; color: var(--text-muted); line-height: 1.5; font-style: italic; }
+    
+    /* STUDENT VALUES BLOCK */
     .a-val {
-      margin-top: 5px; padding: 10px; background: #f8f9fc;
-      border-radius: 3px; border-left: 3px solid #e8a020;
-      font-weight: 500; font-size: 14px; color: #0f1f38;
-      word-break: break-word; /* Uzun javoblar sig'ishi uchun */
+      margin-top: auto; padding: 12px 16px; background: var(--input-bg);
+      border-radius: 4px; border-left: 3px solid rgba(212, 175, 55, 0.5);
+      font-weight: 500; font-size: 14px; color: var(--text-light);
+      word-break: break-word; line-height: 1.4;
     }
-    .no-sessions { text-align: center; padding: 80px; color: #999; }
+    
+    /* Agar javob to'g'ridan-to'g'ri MCQ testi bo'lsa uni alohida yoritish */
+    .a-val strong { color: var(--gold-primary); font-weight: 600; margin-right: 4px; }
+
+    .no-sessions { text-align: center; padding: 100px; color: var(--text-muted); font-size: 16px; }
   </style>
 </head>
 <body>
+
   <div class="topbar">
     <h1>📋 Exam Results Dashboard</h1>
     <div class="topbar-links">
@@ -107,7 +199,6 @@
       <div class="session-card">
         <div class="session-header">
           <div>
-            <!-- Imtihon turi: Mock yoki Final -->
             <div class="s-name">{{ row.session.get_exam_type_display }} — {{ row.session.full_name }}</div>
             <div class="s-meta">
               Group: {{ row.session.group }} &bull; Teacher: {{ row.session.teacher }} &bull; Date: {{ row.session.exam_date }}
@@ -127,17 +218,15 @@
               <span class="dept-tag">{{ ans.dept }}</span>
               <span class="q-title">{{ ans.title }}</span>
             </div>
-            <!-- views.py dan keladigan question_text -->
-            <div class="q-text">"{{ ans.question_text }}"</div>
+            <div class="q-text">"${{ ans.question_text }}$"</div>
             <div class="a-val">
-              <!-- views.py dan keladigan value -->
               <strong>Answer:</strong> {{ ans.value }}
             </div>
           </div>
           {% endfor %}
         </div>
         {% else %}
-          <p style="padding:32px; color:#999; font-style:italic; text-align:center;">No answers submitted for this session.</p>
+          <p style="padding:40px; color: var(--text-muted); font-style:italic; text-align:center;">No answers submitted for this session.</p>
         {% endif %}
       </div>
       {% endfor %}
@@ -145,5 +234,37 @@
       <div class="no-sessions">No exam sessions yet.</div>
     {% endif %}
   </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const tags = document.querySelectorAll('.dept-tag');
+      tags.forEach(tag => {
+        const text = tag.textContent.trim().toLowerCase();
+        if (text.includes('dispatch')) {
+          tag.style.backgroundColor = 'var(--color-dispatch)';
+          tag.style.color = '#000';
+        } else if (text.includes('update')) {
+          tag.style.backgroundColor = 'var(--color-update)';
+          tag.style.color = '#fff';
+        } else if (text.includes('safety')) {
+          tag.style.backgroundColor = 'var(--color-safety)';
+          tag.style.color = '#000';
+        } else if (text.includes('fleet')) {
+          tag.style.backgroundColor = 'var(--color-fleet)';
+          tag.style.color = '#fff';
+        } else if (text.includes('accounting')) {
+          tag.style.backgroundColor = 'var(--color-accounting)';
+          tag.style.color = '#000';
+        } else if (text.includes('recruiting')) {
+          tag.style.backgroundColor = 'var(--color-recruiting)';
+          tag.style.color = '#000';
+        } else if (text.includes('career')) {
+          tag.style.backgroundColor = 'var(--color-career)';
+          tag.style.color = '#000';
+        }
+      });
+    });
+  </script>
+
 </body>
 </html>

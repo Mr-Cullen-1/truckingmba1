@@ -7,85 +7,221 @@
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;800&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
     :root {
-      --navy: #0f1f38;
-      --accent: #6c5ce7; /* English Session uchun binafsha rang */
-      --gold: #e8a020;
-      --red: #c0392b;
-      --light: #f4f6fa;
-      --glass: rgba(255, 255, 255, 0.9);
+      --bg-dark: #121214;
+      --card-bg: #1e1e22;
+      --gold-primary: #d4af37;
+      --gold-gradient: linear-gradient(135deg, #f3e5ab 0%, #d4af37 50%, #aa7c11 100%);
+      --gold-btn: linear-gradient(90deg, #e5c060, #b8860b);
+      --accent: #6c5ce7; /* English Session binafsha neon rang */
+      --accent-glow: rgba(108, 92, 231, 0.15);
+      --text-light: #ffffff;
+      --text-muted: #a0a0a5;
+      --input-bg: #26262b;
+      --red-warning: #c0392b;
     }
-    body { font-family: 'Barlow', sans-serif; background: var(--light); color: #1a1a2e; }
 
-    /* Timer bar dizayni o'zgarishsiz qoldi */
+    body { 
+      font-family: 'Barlow', sans-serif; 
+      background-color: var(--bg-dark);
+      background-image: 
+        linear-gradient(135deg, rgba(18, 18, 20, 0.95) 0%, rgba(26, 26, 30, 0.98) 100%),
+        radial-gradient(circle at 50% 0%, rgba(108, 92, 231, 0.05) 0%, transparent 50%);
+      color: var(--text-light); 
+      min-height: 100vh;
+    }
+
+    /* FIXED TIMER BAR (Markazlashtirilgan taymer bilan) */
     #timer-bar {
       position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
-      background: var(--navy); padding: 10px 32px;
+      background: rgba(30, 30, 34, 0.85);
+      backdrop-filter: blur(12px);
+      padding: 12px 40px;
       display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid rgba(108, 92, 231, 0.2);
+      transition: background 0.5s, border-bottom-color 0.5s;
     }
-    #timer-bar.warning { background: var(--red); animation: pulse 1s infinite; }
-    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.85} }
-    #timer-display { font-family: 'Barlow Condensed', sans-serif; color: var(--gold); font-size: 28px; font-weight: 800; }
-
-    .container { max-width: 850px; margin: 0 auto; padding: 100px 24px 60px; }
-    .page-title { font-family: 'Barlow Condensed', sans-serif; font-size: 36px; font-weight: 800; color: var(--navy); }
-    .page-sub { color: #666; margin-bottom: 36px; }
-
-    .question-card {
-      background: white; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);
-      margin-bottom: 24px; overflow: hidden; border-top: 4px solid var(--accent);
-    }
-    .q-header { padding: 12px 24px; background: #fcfcff; border-bottom: 1px solid #f0f0f5; display: flex; justify-content: space-between; }
-    .q-type-label { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
     
-    .q-body { padding: 24px; }
-    .q-text { font-size: 18px; font-weight: 500; color: var(--navy); margin-bottom: 20px; }
+    #timer-bar.warning { 
+      background: rgba(192, 57, 43, 0.9); 
+      border-bottom-color: #ff4a4a;
+      animation: pulse 1s infinite; 
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.9} }
+    
+    #timer-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      color: var(--text-muted); font-size: 13px;
+      letter-spacing: 2px; text-transform: uppercase;
+    }
+    #timer-bar.warning #timer-label { color: #fff; }
 
-    /* MCQ Styles */
-    .mcq-options { display: grid; gap: 12px; }
+    #timer-display {
+      font-family: 'Barlow Condensed', sans-serif;
+      color: var(--gold-primary);
+      font-size: 32px; font-weight: 800;
+      position: absolute; left: 50%; transform: translateX(-50%);
+    }
+    #timer-bar.warning #timer-display { color: #fff; }
+    
+    #student-info {
+      font-family: 'Barlow Condensed', sans-serif;
+      color: var(--text-muted); font-size: 15px;
+      letter-spacing: 0.5px;
+    }
+    #timer-bar.warning #student-info { color: #fff; }
+
+    /* CONTAINER */
+    .container { max-width: 850px; margin: 0 auto; padding: 110px 24px 80px; }
+    
+    .page-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      background: var(--gold-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 42px; font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .page-sub { color: var(--text-muted); margin-bottom: 40px; font-size: 15px; line-height: 1.4; }
+
+    /* QUESTION CARDS */
+    .question-card {
+      background: var(--card-bg);
+      border-radius: 6px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+      margin-bottom: 25px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-top: 4px solid var(--accent);
+      transition: transform 0.3s ease, border-color 0.3s ease;
+    }
+
+    .question-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(108, 92, 231, 0.4);
+    }
+
+    /* CARD HEADER */
+    .q-header {
+      padding: 16px 24px;
+      background: rgba(255, 255, 255, 0.02);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .q-type-label {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--accent);
+    }
+
+    .q-body { padding: 24px; }
+    .q-text { font-size: 17px; font-weight: 500; color: var(--text-light); margin-bottom: 24px; line-height: 1.5; }
+
+    /* MCQ OPTIONS */
+    .mcq-options { display: flex; flex-direction: column; gap: 12px; }
     .mcq-option input { display: none; }
+    
     .mcq-option label {
       display: flex; align-items: center; padding: 14px 20px;
-      border: 2px solid #eee; border-radius: 6px; cursor: pointer; transition: 0.2s;
+      background: var(--input-bg);
+      border: 1px solid rgba(255, 255, 255, 0.08); 
+      border-radius: 4px; cursor: pointer; transition: all 0.2s ease;
+      font-size: 15px; color: var(--text-light);
     }
-    .mcq-option input:checked + label { border-color: var(--accent); background: #f5f3ff; }
+    
+    .mcq-option label:hover {
+      background: #2c2c33;
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .mcq-option input:checked + label { 
+      border-color: var(--accent); 
+      background: rgba(108, 92, 231, 0.08); 
+      box-shadow: 0 0 12px var(--accent-glow); 
+    }
 
-    /* Scramble (Sentence Building) Styles */
-    .word-pool { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; padding: 15px; background: #f8f9fa; border-radius: 6px; }
-    .word-item { 
-      padding: 6px 14px; background: white; border: 1px solid #ddd; 
-      border-radius: 4px; cursor: pointer; user-select: none; transition: 0.2s;
+    /* SCRAMBLE (Sentence Building) STYLES */
+    .word-pool { 
+      display: flex; flex-wrap: wrap; gap: 10px; 
+      margin-bottom: 18px; padding: 18px; 
+      background: rgba(0, 0, 0, 0.15); 
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 4px; 
     }
-    .word-item:hover { border-color: var(--accent); color: var(--accent); }
-    .word-item.used { opacity: 0.3; cursor: default; }
+    
+    .word-item { 
+      padding: 8px 16px; background: var(--input-bg); 
+      border: 1px solid rgba(255, 255, 255, 0.1); 
+      color: var(--text-light);
+      border-radius: 4px; cursor: pointer; user-select: none; transition: all 0.2s ease;
+      font-size: 14px;
+    }
+    .word-item:hover { 
+      border-color: var(--accent); 
+      color: #fff;
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+    .word-item.used { opacity: 0.15; cursor: default; border-color: transparent; }
     
     .sentence-input { 
-      width: 100%; padding: 15px; border: 2px dashed #ccc; 
-      border-radius: 6px; min-height: 54px; font-size: 16px; 
-      color: var(--navy); background: #fff;
+      width: 100%; padding: 16px; 
+      border: 2px dashed rgba(255, 255, 255, 0.15); 
+      border-radius: 4px; min-height: 56px; font-size: 16px; 
+      color: var(--text-light); background: rgba(0, 0, 0, 0.1);
+      outline: none; transition: border-color 0.3s;
+    }
+    .sentence-input:focus { border-color: var(--accent); }
+
+    .reset-btn {
+      margin-top: 12px; font-size: 13px; border: none; background: none; 
+      color: #e74c3c; cursor: pointer; display: inline-flex; align-items: center; gap: 5px;
+      font-weight: 500; transition: opacity 0.2s;
+    }
+    .reset-btn:hover { opacity: 0.8; }
+
+    /* TYPING STYLES */
+    .typing-answer { 
+      width: 100%; padding: 14px 18px; 
+      background: var(--input-bg);
+      border: 1px solid rgba(255, 255, 255, 0.1); 
+      border-radius: 4px; font-size: 16px; 
+      color: var(--text-light); outline: none; transition: all 0.3s ease;
+    }
+    .typing-answer:focus { 
+      border-color: var(--accent); 
+      box-shadow: 0 0 10px var(--accent-glow);
     }
 
-    /* Typing Styles */
-    .typing-answer { width: 100%; padding: 14px; border: 2px solid #eee; border-radius: 6px; font-size: 16px; outline: none; }
-    .typing-answer:focus { border-color: var(--accent); }
-
+    /* SUBMIT BUTTON */
     .btn-submit {
-      width: 100%; padding: 20px; background: var(--navy); color: white;
-      border: none; border-radius: 6px; font-family: 'Barlow Condensed', sans-serif;
-      font-size: 22px; font-weight: 800; cursor: pointer;
+      width: 100%; padding: 18px; 
+      background: var(--gold-btn); color: #0f1013;
+      border: none; border-radius: 4px; font-family: 'Barlow Condensed', sans-serif;
+      font-size: 20px; font-weight: 800; cursor: pointer;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      transition: all 0.3s ease; margin-top: 15px;
+    }
+    .btn-submit:hover {
+      box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
+      transform: scale(1.01);
     }
   </style>
 </head>
 <body>
 
 <div id="timer-bar">
+  <div id="timer-label">⏱ Time Remaining</div>
   <div id="timer-display">30:00</div>
-  <div style="color: white; font-family: 'Barlow Condensed'">{{ session.full_name }} | ENGLISH MODULE</div>
+  <div id="student-info">{{ session.full_name }} &mdash; ENGLISH MODULE</div>
 </div>
 
 <div class="container">
   <div class="page-title">English Competency Test</div>
   <div class="page-sub">Demonstrate your English skills by completing the following questions. Good luck!</div>
+  
   <form method="post" id="exam-form">
     {% csrf_token %}
     {% for question in questions %}
@@ -99,7 +235,7 @@
           {% if question.question_type == 'mcq' %}
             <div class="q-text">{{ question.text }}</div>
             <div class="mcq-options">
-              {% for val, label in question.options_list %} <!-- views.py da options_list qo'shish kerak -->
+              {% for val, label in question.options_list %}
                 <div class="mcq-option">
                   <input type="radio" name="q_{{ question.id }}" id="q{{ question.id }}_{{ val }}" value="{{ val }}">
                   <label for="q{{ question.id }}_{{ val }}">{{ label }}</label>
@@ -110,10 +246,9 @@
           {% elif question.question_type == 'scramble' %}
             <div class="q-text">Build a correct sentence:</div>
             <div class="word-pool" id="pool_{{ question.id }}">
-              <!-- JavaScript so'zlarni shu yerga generatsiya qiladi -->
-            </div>
+              </div>
             <input type="text" class="sentence-input" name="q_{{ question.id }}" id="input_{{ question.id }}" readonly placeholder="Click words above to build...">
-            <button type="button" onclick="resetScramble('{{ question.id }}')" style="margin-top:10px; font-size:12px; border:none; background:none; color:var(--red); cursor:pointer;">↺ Reset Sentence</button>
+            <button type="button" class="reset-btn" onclick="resetScramble('{{ question.id }}')">↺ Reset Sentence</button>
 
           {% else %}
             <div class="q-text">{{ question.text }}</div>
@@ -129,16 +264,40 @@
 </div>
 
 <script>
-  // Timer logikasi o'zgarishsiz
+  // Timer logikasi va isSubmitting himoyasi
   let remaining = {{ exam_duration }};
+  const WARNING = 60; // 1 daqiqa qolganda qizil ogohlantirish yoqiladi
   const timerEl = document.getElementById('timer-display');
-  setInterval(() => {
+  const barEl   = document.getElementById('timer-bar');
+  const form    = document.getElementById('exam-form');
+  
+  let isSubmitting = false;
+
+  const interval = setInterval(() => {
     remaining--;
     const m = Math.floor(remaining/60).toString().padStart(2,'0');
     const s = (remaining%60).toString().padStart(2,'0');
     timerEl.textContent = `${m}:${s}`;
-    if (remaining <= 0) document.getElementById('exam-form').submit();
+    
+    if (remaining <= WARNING) barEl.classList.add('warning');
+    
+    if (remaining <= 0) { 
+      clearInterval(interval);
+      isSubmitting = true;
+      form.submit(); 
+    }
   }, 1000);
+
+  // Brauzer ogohlantirish darchasini asossiz chiqishini to'sish
+  window.addEventListener('beforeunload', (e) => {
+    if (isSubmitting) return;
+    e.preventDefault(); e.returnValue = '';
+  });
+  
+  form.addEventListener('submit', () => {
+    clearInterval(interval);
+    isSubmitting = true;
+  });
 
   // Scramble Logic
   document.addEventListener('DOMContentLoaded', () => {
@@ -152,7 +311,7 @@
   function setupScramble(id, text) {
     const pool = document.getElementById(`pool_${id}`);
     const words = text.split('/').map(w => w.trim());
-    // So'zlarni ekranda ko'rsatish uchun tasodifiy aralashtirish
+    
     words.sort(() => Math.random() - 0.5).forEach(word => {
       const span = document.createElement('span');
       span.className = 'word-item';

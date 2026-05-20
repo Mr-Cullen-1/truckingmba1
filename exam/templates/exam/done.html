@@ -2,55 +2,142 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Trucking MBA — Submitted</title>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;800&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg-dark: #121214;
+      --card-bg: #1e1e22;
+      --gold-primary: #d4af37;
+      --gold-gradient: linear-gradient(135deg, #f3e5ab 0%, #d4af37 50%, #aa7c11 100%);
+      --gold-btn: linear-gradient(90deg, #e5c060, #b8860b);
+      --text-light: #ffffff;
+      --text-muted: #a0a0a5;
+    }
+
     body {
       font-family: 'Barlow', sans-serif;
-      background: #0f1f38;
+      /* Loyihaning umumiy to'q, geometrik va nafis foni */
+      background-color: var(--bg-dark);
+      background-image: 
+        linear-gradient(135deg, rgba(18, 18, 20, 0.95) 0%, rgba(26, 26, 30, 0.98) 100%),
+        radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.08) 0%, transparent 60%);
       min-height: 100vh;
-      display: flex; align-items: center; justify-content: center;
+      display: flex; 
+      align-items: center; 
+      justify-content: center;
+      padding: 20px;
     }
+
     .card {
-      background: white; border-radius: 4px;
-      max-width: 500px; width: 100%;
-      text-align: center; padding: 60px 48px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      background: var(--card-bg); 
+      border-radius: 6px;
+      border: 1px solid rgba(212, 175, 55, 0.1);
+      max-width: 500px; 
+      width: 100%;
+      text-align: center; 
+      padding: 60px 48px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.3s, box-shadow 0.3s;
     }
+
+    /* Yuqoridagi nafis tillarang chiziq */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 3px;
+      background: var(--gold-gradient);
+    }
+
+    .card:hover {
+      border-color: rgba(212, 175, 55, 0.25);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(212, 175, 55, 0.02);
+    }
+
+    /* Tasdiq belgisi (Neon Oltin Glow) */
     .check {
-      width: 72px; height: 72px; border-radius: 50%;
-      background: #e8f5e9;
+      width: 80px; height: 80px; 
+      border-radius: 50%;
+      background: rgba(212, 175, 55, 0.08);
+      border: 2px solid var(--gold-primary);
       display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 28px; font-size: 36px;
+      margin: 0 auto 32px; 
+      font-size: 38px;
+      color: var(--gold-primary);
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+      animation: checkPulse 2s infinite alternate;
     }
+
+    @keyframes checkPulse {
+      0% { box-shadow: 0 0 15px rgba(212, 175, 55, 0.15); }
+      100% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.35); transform: scale(1.02); }
+    }
+
     h1 {
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: 30px; font-weight: 800;
-      color: #0f1f38; margin-bottom: 14px;
+      background: var(--gold-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-size: 36px; font-weight: 800;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
-    p { color: #555; font-size: 16px; line-height: 1.6; margin-bottom: 36px; }
-    .actions { display: flex; justify-content: center; } 
+
+    p { 
+      color: var(--text-muted); 
+      font-size: 16px; 
+      line-height: 1.6; 
+      margin-bottom: 40px; 
+    }
+
+    .actions { 
+      display: flex; 
+      justify-content: center; 
+    } 
+
+    /* PREMIUM ACTION BUTTON */
     .btn {
-      padding: 14px 40px; border: none; border-radius: 3px;
+      padding: 15px 44px; 
+      border: none; 
+      border-radius: 4px;
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: 17px; font-weight: 700;
-      cursor: pointer; text-decoration: none; display: inline-block;
-      transition: opacity 0.2s;
+      font-size: 18px; 
+      font-weight: 700;
+      cursor: pointer; 
+      text-decoration: none; 
+      display: inline-block;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
     }
-    .btn-primary { background: #0f1f38; color: white; }
-    .btn:hover { opacity: 0.9; }
+
+    .btn-primary { 
+      background: var(--gold-btn); 
+      color: #0f1013; 
+    }
+
+    .btn-primary:hover { 
+      box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
+      transform: scale(1.02);
+    }
   </style>
 </head>
 <body>
+
   <div class="card">
     <div class="check">✓</div>
     <h1>Submitted!</h1>
     <p>Your answers have been collected.<br>Thank you for your participation.</p>
     <div class="actions">
-      <!-- 'register' o'rniga 'home' (bosh sahifa) ga ulaymiz -->
       <a href="{% url 'home' %}" class="btn btn-primary">Back to Dashboard</a>
     </div>
   </div>
+
 </body>
 </html>

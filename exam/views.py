@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from django.contrib.auth import authenticate, logout
+from django.contrib.auth import authenticate, login, logout  # login qo'shildi
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.csrf import ensure_csrf_cookie
@@ -18,9 +18,29 @@ def index_view(request):
     """3 ta bo'limli asosiy dashboard sahifasi"""
     return render(request, 'exam/index.html')
 
+# 1.5 TEACHER LOGIN VIEW (YANGI O'QITUVCHI LOGIN SAHIFASI)
+def teacher_login_view(request):
+    """O'qituvchilar uchun portal uslubidagi maxsus login sahifasi"""
+    if request.user.is_authenticated and request.user.is_staff:
+        return redirect('admin_results')
+        
+    error = None
+    if request.method == 'POST':
+        u = request.POST.get('username')
+        p = request.POST.get('password')
+        user = authenticate(request, username=u, password=p)
+        
+        if user is not None and user.is_staff:
+            login(request, user)
+            return redirect('admin_results')
+        else:
+            error = "Invalid credentials or not authorized as a teacher."
+            
+    return render(request, 'exam/admin_login.html', {'error': error})
+
 # 2. LOGISTICS MOCK REGISTRATION
 def register_mock_view(request):
-    """Logistika Mock Exam uchun ro'yxatdan o'tish[cite: 2]"""
+    """Logistika Mock Exam uchun ro'yxatdan o'tish"""
     if request.method == 'POST':
         form = MockRegistrationForm(request.POST)
         if form.is_valid():
@@ -37,16 +57,15 @@ def register_mock_view(request):
         'subtitle': 'Mock Registration'
     })
 
-# 3. ENGLISH SESSION REGISTRATION (YANGI)
+# 3. ENGLISH SESSION REGISTRATION
 def register_english_view(request):
-    """Ingliz tili sessiyasi uchun alohida ro'yxatdan o'tish[cite: 3]"""
+    """Ingliz tili sessiyasi uchun alohida ro'yxatdan o'tish"""
     if request.method == 'POST':
         form = EnglishRegistrationForm(request.POST)
         if form.is_valid():
             session = form.save(commit=False)
-            session.exam_type = 'mock' # English sessionlar mock sifatida saqlanadi
+            session.exam_type = 'mock'
             session.exam_date = timezone.now().date()
-            # ChoiceField bitta string qiymat qaytaradi
             session.save()
             return redirect('exam_start', session_id=session.id)
     else:
@@ -60,7 +79,7 @@ def register_english_view(request):
 
 # 4. FINAL EXAM KODINI TEKSHIRISH
 def final_access_view(request):
-    """Final Examga kirish uchun o'qituvchi loginini tekshirish[cite: 2]"""
+    """Final Examga kirish uchun o'qituvchi loginini tekshirish"""
     if request.method == 'POST':
         u = request.POST.get('username')
         p = request.POST.get('password')
@@ -74,7 +93,7 @@ def final_access_view(request):
 
 # 5. FINAL REGISTRATION
 def register_final_view(request):
-    """Logistika Final Exam uchun ro'yxatdan o'tish[cite: 2]"""
+    """Logistika Final Exam uchun ro'yxatdan o'tish"""
     if not request.session.get('final_allowed'):
         return redirect('final_access')
     if request.method == 'POST':
@@ -93,10 +112,10 @@ def register_final_view(request):
         'subtitle': 'Official Certification'
     })
 
-# 6. IMTIHON JARAYONI (6+4+2 VA 10+5+5)
+# 6. IMTIHON JARAYONI
 @ensure_csrf_cookie
 def exam_view(request, session_id):
-    """Savollarni tasodifiy saralash va imtihon jarayoni[cite: 2]"""
+    """Savollarni tasodifiy saralash va imtihon jarayoni"""
     session = get_object_or_404(ExamSession, id=session_id, is_complete=False)
     
     if request.method == 'POST':
@@ -123,7 +142,6 @@ def exam_view(request, session_id):
     all_qs = []
 
     if is_english:
-        # INGLIZ TILI LOGIKASI (10+5+5)[cite: 3]
         for d in selected_depts:
             if d.startswith('eng_'):
                 mcqs = list(Question.objects.filter(department=d, question_type='mcq', is_active=True))
@@ -138,7 +156,6 @@ def exam_view(request, session_id):
         template_name = 'exam/exam_eng.html'
         exam_time = 30 * 60
     else:
-        # LOGISTIKA LOGIKASI (6+4+2)[cite: 2]
         mcq_qs = []
         if selected_depts:
             per_dept = 6 // len(selected_depts)
@@ -171,9 +188,10 @@ def exam_view(request, session_id):
     })
 
 # 7. TEACHER'S PANEL (ADMIN RESULTS)
-@login_required(login_url='/admin/login/')
+# URL manzili yangi o'qituvchi loginiga yo'naltirildi
+@login_required(login_url='/teacher/login/')
 def admin_results_view(request):
-    """Natijalarni ko'rsatish[cite: 2]"""
+    """Natijalarni ko'rsatish"""
     if not request.user.is_staff:
         return redirect('home')
 
@@ -204,7 +222,7 @@ def admin_results_view(request):
 # 8. EXCEL EXPORT
 @staff_member_required
 def export_excel_view(request):
-    """Natijalarni Excelga yuklash[cite: 2]"""
+    """Natijalarni Excelga yuklash"""
     sessions = ExamSession.objects.prefetch_related('answers__question').all()
     dept_map = dict(DEPARTMENT_CHOICES)
     
@@ -217,7 +235,7 @@ def export_excel_view(request):
     top_align = Alignment(vertical="top", wrap_text=True)
 
     headers = ["Type", "Full Name", "Phone", "Date", "Group", "Teacher", "Departments"]
-    for i in range(1, 25): headers.append(f"Q&A {i}") # Ustunlarni 24 taga kengaytirdik
+    for i in range(1, 25): headers.append(f"Q&A {i}")
 
     for col, h in enumerate(headers, 1):
         cell = ws.cell(row=1, column=col, value=h)
@@ -247,5 +265,5 @@ def export_excel_view(request):
 
 # 9. DONE VIEW
 def done_view(request):
-    """Imtihon yakunlangandagi sahifa[cite: 2]"""
+    """Imtihon yakunlangandagi sahifa"""
     return render(request, 'exam/done.html')
