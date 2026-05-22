@@ -1,9 +1,18 @@
 from django.contrib import admin
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.utils import timezone
+from django.urls import path
+from django.shortcuts import render
+from django import forms
+from django.contrib import messages
 import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment
 from .models import Question, ExamSession, Answer, DEPARTMENT_CHOICES
+
+
+# Excel faylni admin panel orqali qabul qilish uchun kichik forma
+class ExcelImportForm(forms.Form):
+    excel_file = forms.FileField(label="Excel faylini tanlang (.xlsx)")
 
 
 @admin.register(Question)
@@ -22,6 +31,69 @@ class QuestionAdmin(admin.ModelAdmin):
             'classes': ('collapse',),
         }),
     )
+
+    # Shaxsiy tugmani chiqarish uchun admin template'ni ulaymiz
+    change_list_template = "admin/question_changelist.html"
+
+    def get_urls(self):
+        urls = super().get_urls()
+        custom_urls = [
+            path('import-excel/', self.import_excel, name='import_excel'),
+        ]
+        return custom_urls + urls
+
+    def import_excel(self, request):
+        if request.method == "POST":
+            form = ExcelImportForm(request.POST, request.FILES)
+            if form.is_valid():
+                excel_file = request.FILES['excel_file']
+                try:
+                    wb = openpyxl.load_workbook(excel_file)
+                    ws = wb.active
+                    
+                    count = 0
+                    # Sarlavhadan keyingi (2-qator) ma'lumotlarni o'qishni boshlaymiz
+                    for row in ws.iter_rows(min_row=2, values_only=True):
+                        if not row or not row[0]:
+                            continue
+                            
+                        dept, q_type, title, text, opt_a, opt_b, opt_c, opt_d, order, is_active = row[:10]
+                        
+                        # Ma'lumotlarni tozalash va standart qiymat berish
+                        order = int(order) if order is not None else 0
+                        is_active = bool(is_active) if is_active is not None else True
+                        
+                        # text (savol matni) orqali tekshirib, bor bo'lsa yangilaydi, yo'q bo'lsa yangi ochadi
+                        Question.objects.update_or_create(
+                            text=str(text).strip(),
+                            defaults={
+                                'department': str(dept).strip(),
+                                'question_type': str(q_type).strip(),
+                                'title': str(title).strip(),
+                                'option_a': str(opt_a).strip() if opt_a else '',
+                                'option_b': str(opt_b).strip() if opt_b else '',
+                                'option_c': str(opt_c).strip() if opt_c else '',
+                                'option_d': str(opt_d).strip() if opt_d else '',
+                                'order': order,
+                                'is_active': is_active
+                            }
+                        )
+                        count += 1
+                    
+                    self.message_user(request, f"Muvaffaqiyatli yakunlandi! {count} ta savol bazaga yuklandi.", messages.SUCCESS)
+                    return HttpResponseRedirect("../")
+                except Exception as e:
+                    self.message_user(request, f"Xatolik yuz berdi: {str(e)}", messages.ERROR)
+                    return HttpResponseRedirect(".")
+        else:
+            form = ExcelImportForm()
+        
+        context = {
+            'form': form,
+            'opts': self.model._meta,
+            'title': "Exceldan savollarni import qilish"
+        }
+        return render(request, "admin/excel_import_form.html", context)
 
 
 class AnswerInline(admin.TabularInline):
@@ -70,7 +142,6 @@ def export_sessions_excel(modeladmin, request, queryset):
         for col, val in enumerate(row_data, 1):
             ws.cell(row=row_num, column=col, value=val)
 
-        # Write answers after base columns
         ans_col = len(base_headers) + 1
         for ans in session.answers.select_related('question').all():
             val = ans.selected_option.upper() if ans.selected_option else ans.answer_text

@@ -22,7 +22,6 @@
 
     body { 
       font-family: 'Barlow', sans-serif; 
-      /* Boshqa sahifalar bilan bir xil premium geometrik fon */
       background-color: var(--bg-dark);
       background-image: 
         linear-gradient(135deg, rgba(18, 18, 20, 0.95) 0%, rgba(26, 26, 30, 0.98) 100%),
@@ -149,7 +148,7 @@
       transition: all 0.2s ease;
     }
     
-    .module-choice label:hover:not([style*="disabled"]) {
+    .module-choice label:hover {
       border-color: rgba(212, 175, 55, 0.3);
       background: #2b2b30;
     }
@@ -235,17 +234,10 @@
           <label>Choose Module</label>
           <div class="module-choice">
             {% for radio in form.departments %}
-                {% if radio.data.value == 'eng_mod2' or radio.data.value == 'eng_mod3' %}
-                    <label style="opacity: 0.35; cursor: not-allowed; background: rgba(255,255,255,0.02); border-style: dashed; border-color: rgba(255,255,255,0.1);">
-                        <input type="radio" name="{{ radio.data.name }}" value="{{ radio.data.value }}" disabled>
-                        <span style="color: var(--text-muted);">{{ radio.choice_label }} (Soon)</span>
-                    </label>
-                {% else %}
-                    <label>
-                        {{ radio.tag }}
-                        <span>{{ radio.choice_label }}</span>
-                    </label>
-                {% endif %}
+                <label>
+                    {{ radio.tag }}
+                    <span>{{ radio.choice_label }}</span>
+                </label>
             {% endfor %}
           </div>
         </div>
