@@ -10,8 +10,14 @@ urlpatterns = [
     
     path('final/access/', views.final_access_view, name='final_access'),
     path('final/register/', views.register_final_view, name='register_final'),
+    
+    # Imtihon topshirish oynasi
     path('exam/<int:session_id>/', views.exam_view, name='exam_start'),
     path('done/', views.done_view, name='exam_done'),
+    
+    # --- CHEATING'GA QARSHI YANGI URL YO'LLARI ---
+    path('exam/<int:session_id>/block/', views.block_session_view, name='block_session'),
+    path('exam/<int:session_id>/restricted/', views.restricted_view, name='restricted_view'),
     
     # Yangi maxsus O'qituvchi login sahifasi yo'li
     path('teacher/login/', views.teacher_login_view, name='teacher_login'),

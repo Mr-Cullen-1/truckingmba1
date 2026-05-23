@@ -337,25 +337,69 @@
     if (remaining <= WARNING) barEl.classList.add('warning');
     if (remaining <= 0) { 
       clearInterval(interval); 
-      isSubmitting = true; // Vaqt tugab avtomatik topshirilganda ham bloklamaslik uchun
+      isSubmitting = true; // Vaqt tugab avtomatik topshirilganda ham blocker'ni o'chiramiz
       form.submit(); 
     }
   }, 1000);
-
-  // SAHIFANI BILMASDAN YOPISH YOKI REFRESH QILISHDAN HIMOYA
-  window.addEventListener('beforeunload', (e) => {
-    // Agar foydalanuvchi tugmani bosgan bo'lsa, ogohlantirishni ko'rsatmaymiz
-    if (isSubmitting) return;
-    
-    e.preventDefault(); 
-    e.returnValue = '';
-  });
 
   // TUGMA BOSILIB FORMA TOPSHIRILAYOTGANDA BLOCKERNI O'CHIRAMIZ
   form.addEventListener('submit', () => {
     clearInterval(interval);
     isSubmitting = true; 
   });
+
+  // --- ANTI-CHEAT TIZIMI (JAVASCRIPT) ---
+  const sessionId = "{{ session.id }}";
+
+  // 1. BOSHQA TAB YOKI PROGRAMMAGA O'TISHNI USHLASH
+  document.addEventListener("visibilitychange", function() {
+    if (document.hidden && !isSubmitting) {
+      triggerCheatBlock("Tab yoki dastur almashtirildi (Tab/App changed)");
+    }
+  });
+
+// 2. SAHIFANI REFRESH (YANGILASH) QILISHNI USHLASH (Brauzer oynasisiz)
+window.addEventListener('unload', function () {
+  if (!isSubmitting) {
+    // Talaba refresh qilsa, hech qanday ogohlantirish oynasisiz orqa fonda silliq bloklaymiz
+    triggerCheatBlock("Sahifa yangilandi (Page refreshed)");
+  }
+});
+
+  // Backend'ga sessiyani bloklash haqida POST so'rov yuborish funksiyasi
+  function triggerCheatBlock(reasonText) {
+    const url = `/exam/${sessionId}/block/`;
+    
+    fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getDjangoCSRFToken()
+      },
+      body: JSON.stringify({ reason: reasonText })
+    }).then(response => {
+      if (response.ok) {
+        // Muvaffaqiyatli bloklangach, talabani qizil restricted sahifasiga yo'naltirish
+        window.location.href = `/exam/${sessionId}/restricted/`;
+      }
+    });
+  }
+
+  // Brauzerdan Django CSRF tokenni o'qib olish funksiyasi
+  function getDjangoCSRFToken() {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, 10) === ('csrftoken=')) {
+          cookieValue = decodeURIComponent(cookie.substring(10));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
 </script>
 </body>
 </html>

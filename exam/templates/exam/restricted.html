@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restricted — Cheat Detection</title>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;800&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    :root {
+      --bg-dark: #121214;
+      --card-bg: #1e1e22;
+      --gold-primary: #d4af37;
+      --gold-gradient: linear-gradient(135deg, #f3e5ab 0%, #d4af37 50%, #aa7c11 100%);
+      --danger-color: #ff4a4a;
+      --danger-bg: rgba(255, 74, 74, 0.1);
+      --success-color: #28a745;
+      --text-light: #ffffff;
+      --text-muted: #a0a0a5;
+      --input-bg: #26262b;
+    }
+
+    body { 
+      font-family: 'Barlow', sans-serif; 
+      background-color: var(--bg-dark);
+      background-image: 
+        linear-gradient(135deg, rgba(18, 18, 20, 0.95) 0%, rgba(26, 26, 30, 0.98) 100%),
+        radial-gradient(circle at 50% 20%, rgba(255, 74, 74, 0.05) 0%, transparent 50%);
+      display: flex; 
+      align-items: center; 
+      justify-content: center; 
+      min-height: 100vh; 
+      padding: 20px; 
+      color: var(--text-light);
+    }
+
+    .restricted-card {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 480px;
+      border-radius: 6px;
+      border: 1px solid var(--danger-color);
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+    }
+
+    .card-header {
+      background: rgba(30, 30, 34, 0.6);
+      padding: 35px 35px 25px;
+      border-bottom: 1px solid rgba(255, 74, 74, 0.2);
+      text-align: center;
+    }
+
+    .brand-mini {
+      font-family: 'Barlow Condensed', sans-serif;
+      color: var(--gold-primary);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    
+    .card-header h2 {
+      font-family: 'Barlow Condensed', sans-serif;
+      color: var(--danger-color);
+      font-size: 32px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .card-content { padding: 35px; }
+
+    .warning-text {
+      color: var(--text-light);
+      font-size: 16px;
+      text-align: center;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    .reason-box {
+      background: var(--danger-bg);
+      border-left: 4px solid var(--danger-color);
+      color: var(--danger-color);
+      padding: 12px 16px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+
+    .form-group { margin-bottom: 18px; }
+    
+    label {
+      display: block;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--gold-primary);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--input-bg);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      font-family: 'Barlow', sans-serif;
+      font-size: 15px;
+      color: var(--text-light);
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    input[type="text"]:focus, input[type="password"]:focus {
+      border-color: var(--gold-primary);
+    }
+
+    .error-msg {
+      color: var(--danger-color);
+      background: rgba(255, 74, 74, 0.05);
+      padding: 10px;
+      border-radius: 4px;
+      font-size: 14px;
+      text-align: center;
+      margin-bottom: 18px;
+      border: 1px solid rgba(255, 74, 74, 0.15);
+    }
+
+    .btn-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 25px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 4px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn:hover {
+      transform: scale(1.01);
+    }
+
+    .btn-approve {
+      background: var(--success-color);
+      color: #ffffff;
+    }
+    .btn-approve:hover {
+      box-shadow: 0 0 15px rgba(40, 167, 69, 0.3);
+    }
+
+    .btn-reject {
+      background: #3a1a1a;
+      border: 1px solid var(--danger-color);
+      color: var(--danger-color);
+    }
+    .btn-reject:hover {
+      background: var(--danger-color);
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="restricted-card">
+    <div class="card-header">
+      <div class="brand-mini">Trucking MBA</div>
+      <h2>🔒 Restricted</h2>
+    </div>
+    
+    <div class="card-content">
+      <p class="warning-text">
+        Student <strong>{{ session.full_name }}</strong>, your exam has been locked due to a security violation.
+      </p>
+      
+      <div class="reason-box">
+        Violation: {{ session.block_reason }}
+      </div>
+
+      {% if error %}
+        <div class="error-msg">{{ error }}</div>
+      {% endif %}
+
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label>Teacher Username</label>
+          <input type="text" name="teacher_username" autocomplete="off" required>
+        </div>
+        <div class="form-group">
+          <label>Teacher Password</label>
+          <input type="password" name="teacher_password" required>
+        </div>
+        
+        <div class="btn-actions">
+          <button type="submit" name="action" value="approve" class="btn btn-approve">
+            ✅ Approve (Shuffle & Continue)
+          </button>
+          <button type="submit" name="action" value="reject" class="btn btn-reject">
+            ❌ Reject (Cancel Session)
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>

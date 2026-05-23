@@ -1,13 +1,14 @@
+import json
+import random
+import openpyxl
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils import timezone
-from django.contrib.auth import authenticate, login, logout  # login qo'shildi
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.contrib import messages
-from django.http import HttpResponse
-import random
-import openpyxl
+from django.http import HttpResponse, JsonResponse
 from openpyxl.styles import Font, PatternFill, Alignment
 
 from .models import Question, ExamSession, Answer, DEPARTMENT_CHOICES
@@ -118,6 +119,10 @@ def exam_view(request, session_id):
     """Savollarni tasodifiy saralash va imtihon jarayoni"""
     session = get_object_or_404(ExamSession, id=session_id, is_complete=False)
     
+    # XAVFSIZLIK: Agar talaba bloklangan bo'lsa, uni exam sahifasidan qizil oynaga majburlab otamiz
+    if session.is_blocked:
+        return redirect('restricted_view', session_id=session.id)
+
     if request.method == 'POST':
         question_ids = request.POST.getlist('question_ids')
         for q_id in question_ids:
@@ -178,7 +183,8 @@ def exam_view(request, session_id):
         template_name = 'exam/exam.html'
         exam_time = 20 * 60
 
-    all_qs.sort(key=lambda q: q.order)
+    # Savollarni endi order bo'yicha saralamaymiz, random aralashtirilgan holicha qoladi.
+    # Bu o'qituvchi ma'qullaganda savollar mutlaqo oyna ochilganda boshqa o'ringa o'tib ketishi uchun xizmat qiladi.
 
     return render(request, template_name, {
         'session': session,
@@ -187,8 +193,64 @@ def exam_view(request, session_id):
         'warning_time': 5 * 60,
     })
 
+# --- CHEATING'GA QARSHI YANGI METODLAR ---
+
+def block_session_view(request, session_id):
+    """API: Talaba tabni o'zgartirsa yoki refresh qilsa, sessiyani bloklash"""
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            session = get_object_or_404(ExamSession, id=session_id, is_complete=False)
+            session.is_blocked = True
+            session.block_reason = data.get('reason', 'Noma\'lum xavf')
+            session.save()
+            return JsonResponse({"status": "blocked"})
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=400)
+    return JsonResponse({"status": "error", "message": "Method not allowed"}, status=405)
+
+
+def restricted_view(request, session_id):
+    """Bloklangan holat oynasi (O'qituvchi nazorati va ruxsati)"""
+    session = get_object_or_404(ExamSession, id=session_id)
+    
+    # Agar adashib kirgan bo'lsa va bloklanmagan bo'lsa, testga qaytaramiz
+    if not session.is_blocked:
+        return redirect('exam_start', session_id=session.id)
+        
+    error_message = None
+
+    if request.method == "POST":
+        action = request.POST.get('action')  # 'approve' yoki 'reject'
+        username = request.POST.get('teacher_username')
+        password = request.POST.get('teacher_password')
+        
+        # O'qituvchi login parolini tekshirish
+        user = authenticate(request, username=username, password=password)
+        
+        if user is not None and user.is_staff:
+            if action == "approve":
+                # O'qituvchi ma'qulladi: blokni yechamiz va testga qaytaramiz
+                session.is_blocked = False
+                session.save()
+                return redirect('exam_start', session_id=session.id)
+                
+            elif action == "reject":
+                # O'qituvchi rad etdi: joriy sessiya butunlay tugatiladi
+                session.is_complete = True
+                session.save()
+                return redirect('home')  # Asosiy dashboardga haydash
+        else:
+            error_message = "Xato login yoki parol! Faqat mas'ul o'qituvchi davom ettira oladi."
+
+    return render(request, 'exam/restricted.html', {
+        'session': session,
+        'error': error_message
+    })
+
+# --- ESKI FUNKSIYALARNING DAVOMI (O'ZGARSISIZ) ---
+
 # 7. TEACHER'S PANEL (ADMIN RESULTS)
-# URL manzili yangi o'qituvchi loginiga yo'naltirildi
 @login_required(login_url='/teacher/login/')
 def admin_results_view(request):
     """Natijalarni ko'rsatish"""

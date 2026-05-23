@@ -37,7 +37,7 @@ class Question(models.Model):
 
     @property
     def options_list(self):
-        """Template (HTML) ichida variantlarni loop qilish uchun qulay property[cite: 1]"""
+        """Template (HTML) ichida variantlarni loop qilish uchun qulay property"""
         options = []
         if self.option_a: options.append(('a', self.option_a))
         if self.option_b: options.append(('b', self.option_b))
@@ -59,13 +59,17 @@ class ExamSession(models.Model):
     exam_date = models.DateField()
     group = models.CharField(max_length=100)
     teacher = models.CharField(max_length=200, blank=True, null=True)
-    departments = models.CharField(max_length=300, default='') # Tanlangan modullar vergul bilan saqlanadi[cite: 1]
+    departments = models.CharField(max_length=300, default='') # Tanlangan modullar vergul bilan saqlanadi
     started_at = models.DateTimeField(auto_now_add=True)
     submitted_at = models.DateTimeField(null=True, blank=True)
     is_complete = models.BooleanField(default=False)
+    
+    # --- CHEATING GA QARSHI YANGI USTUNLAR ---
+    is_blocked = models.BooleanField(default=False, help_text="Talaba qoidani buzsa True bo'ladi")
+    block_reason = models.CharField(max_length=100, blank=True, null=True, help_text="Refresh yoki Tab o'zgarishi")
 
     def get_departments_list(self):
-        """Vergul bilan ajratilgan departamentlarni list ko'rinishida qaytaradi[cite: 1]"""
+        """Vergul bilan ajratilgan departamentlarni list ko'rinishida qaytaradi"""
         return [d.strip() for d in self.departments.split(',') if d.strip()]
 
     def __str__(self):
@@ -75,4 +79,4 @@ class Answer(models.Model):
     session = models.ForeignKey(ExamSession, on_delete=models.CASCADE, related_name='answers')
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     answer_text = models.TextField(blank=True)
-    selected_option = models.CharField(max_length=1, blank=True) # Faqat MCQ uchun ishlatiladi[cite: 1]
+    selected_option = models.CharField(max_length=1, blank=True) # Faqat MCQ uchun ishlatiladi
